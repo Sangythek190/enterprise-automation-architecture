@@ -6,6 +6,16 @@ A Product Manager portfolio project demonstrating how I designed and deployed 30
 
 [View the interactive demo](https://sangythek190.github.io/enterprise-automation-architecture/)
 
+## All Partner Demos
+
+| Integration | Demo |
+|------------|------|
+| [Partner Playbook (All 5)](https://github.com/Sangythek190/partner-integration-playbook) | [Combined Hub](https://sangythek190.github.io/partner-integration-playbook/) |
+| **Telkom — 30+ Automations** | **You are here** |
+| [Neighborly — 16 Brands](https://github.com/Sangythek190/neighborly-integration-dashboard) | [Dashboard Demo](https://sangythek190.github.io/neighborly-integration-dashboard/) |
+| [Italia Online — Stripe Connect](https://github.com/Sangythek190/italia-online-integration) | [Timeline Demo](https://sangythek190.github.io/italia-online-integration/) |
+| [Kaseya — $2.2M Enterprise](https://github.com/Sangythek190/kaseya-enterprise-integration) | [Executive Briefing](https://sangythek190.github.io/kaseya-enterprise-integration/) |
+
 ## What This Demonstrates
 
 - **Operational Scale** — 30+ automations across 6 categories (Order Processing, Fulfillment, Contract Billing Sync, Product Management, Retention, Onboarding) running in production
