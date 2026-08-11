@@ -1001,6 +1001,7 @@
             .fulfill-grid { grid-template-columns: 1fr; }
             .sim-stats-grid { grid-template-columns: repeat(2, 1fr); }
             .sim-body { padding: 24px; }
+            .partner-context-grid { grid-template-columns: 1fr !important; }
         }
     </style>
 </head>
@@ -1031,6 +1032,52 @@
                 <div class="stat-card">
                     <div class="stat-number">0</div>
                     <div class="stat-label">Manual steps in order flow</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PARTNER CONTEXT
+         ============================================ -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Partner Context</h2>
+            <p class="section-subtitle">Who this was built for and why it matters</p>
+            <div class="partner-context-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+                <div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:32px;backdrop-filter:blur(10px);">
+                    <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px;">THE PARTNER</div>
+                    <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">Telkom &mdash; YEP (Yellow Pages)</div>
+                    <div style="font-size:14px;color:var(--text-muted);line-height:1.7;">
+                        Telkom is South Africa's largest telecommunications company. Their YEP (Yellow Pages) digital division operates 19 business directories serving 20M+ users across the country. Vendasta powers the SMB product stack — websites, SEO, social media, advertising — for Telkom's 500,000+ business subscribers.
+                    </div>
+                </div>
+                <div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:32px;backdrop-filter:blur(10px);">
+                    <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px;">BUSINESS DATA</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div>
+                            <div style="font-size:24px;font-weight:700;color:#fff;">500,000+</div>
+                            <div style="font-size:12px;color:var(--text-muted);">Business subscribers</div>
+                        </div>
+                        <div>
+                            <div style="font-size:24px;font-weight:700;color:#fff;">19</div>
+                            <div style="font-size:12px;color:var(--text-muted);">Business directories</div>
+                        </div>
+                        <div>
+                            <div style="font-size:24px;font-weight:700;color:#fff;">20M+</div>
+                            <div style="font-size:12px;color:var(--text-muted);">Users across South Africa</div>
+                        </div>
+                        <div>
+                            <div style="font-size:24px;font-weight:700;color:#fff;">ZAR</div>
+                            <div style="font-size:12px;color:var(--text-muted);">Billing currency (Rand)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:24px;backdrop-filter:blur(10px);">
+                <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent-light);margin-bottom:12px;">WHY THIS INTEGRATION EXISTS</div>
+                <div style="font-size:14px;color:var(--text-muted);line-height:1.7;">
+                    Telkom's YEP division needed to automate the entire order-to-fulfillment pipeline for their SMB product stack. With 500,000+ subscribers and growing, manual processes for order processing, credit vetting, fulfillment, and billing were creating delays, revenue leakage, and dropped orders. I designed 30+ automations that eliminated every manual step — from the moment a sales rep submits an order to the moment the SMB's product goes live, with built-in retention workflows when subscribers cancel.
                 </div>
             </div>
         </div>
