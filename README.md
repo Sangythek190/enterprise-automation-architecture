@@ -2,6 +2,18 @@
 
 A Product Manager portfolio project demonstrating how I designed and deployed 30+ production automations for a 500,000+ subscriber telecom partner ecosystem across 19 directories.
 
+## Northstar Metrics
+
+| Metric | Value |
+|--------|-------|
+| Paying SMBs (Vendasta) | 833 |
+| Vendasta Monthly Billing | $62K |
+| Total Monthly Revenue | $5.7M - $6.1M |
+| Net Revenue Retention | 100% NRR |
+| Churn | Zero churn |
+| Total Subscribers | 500,000+ |
+| Business Directories | 19 |
+
 ## Live Demo
 
 [View the interactive demo](https://sangythek190.github.io/enterprise-automation-architecture/)
