@@ -1,1856 +1,1601 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Automation Architecture — 30+ Production Workflows</title>
-    <style>
-        :root {
-            --bg: #0a0a1a;
-            --surface: rgba(255,255,255,0.04);
-            --surface-hover: rgba(255,255,255,0.08);
-            --glass: rgba(255,255,255,0.06);
-            --glass-border: rgba(255,255,255,0.1);
-            --text: #e4e4ef;
-            --text-muted: #8888a4;
-            --accent: #06b6d4;
-            --accent-light: #22d3ee;
-            --green: #22c55e;
-            --green-glow: rgba(34,197,94,0.15);
-            --red: #ef4444;
-            --blue: #3b82f6;
-            --blue-glow: rgba(59,130,246,0.15);
-            --purple: #8b5cf6;
-            --purple-glow: rgba(139,92,246,0.15);
-            --cyan: #06b6d4;
-            --cyan-glow: rgba(6,182,212,0.15);
-            --amber: #f59e0b;
-            --amber-glow: rgba(245,158,11,0.15);
-            --green-border: rgba(34,197,94,0.4);
-            --blue-border: rgba(59,130,246,0.4);
-            --purple-border: rgba(139,92,246,0.4);
-            --cyan-border: rgba(6,182,212,0.4);
-            --amber-border: rgba(245,158,11,0.4);
-            --gradient-1: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-            --gradient-2: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
-            --gradient-3: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image:
-                linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ========================================
-           HERO
-           ======================================== */
-        .hero {
-            text-align: center;
-            padding: 80px 0 60px;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: var(--accent-light);
-            margin-bottom: 24px;
-            backdrop-filter: blur(10px);
-        }
-
-        .hero h1 {
-            font-size: 44px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
-        }
-
-        .hero h2 {
-            font-size: 18px;
-            font-weight: 400;
-            color: var(--text-muted);
-            max-width: 780px;
-            margin: 0 auto 40px;
-            line-height: 1.7;
-        }
-
-        .hero-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .stat-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px 16px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* ========================================
-           SECTION STYLES
-           ======================================== */
-        .section {
-            padding: 60px 0;
-        }
-
-        .section-title {
-            font-size: 32px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #fff 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 16px;
-            margin-bottom: 40px;
-            max-width: 650px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* ========================================
-           AUTOMATION CATALOG
-           ======================================== */
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .catalog-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.2s, border-color 0.3s;
-            cursor: default;
-        }
-
-        .catalog-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
-        }
-
-        .catalog-icon {
-            font-size: 28px;
-            margin-bottom: 12px;
-        }
-
-        .catalog-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-
-        .catalog-count {
-            display: inline-block;
-            background: var(--cyan-glow);
-            color: var(--accent-light);
-            border: 1px solid var(--cyan-border);
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .catalog-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .catalog-items {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .catalog-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: var(--text-muted);
-            padding: 3px 0;
-        }
-
-        .catalog-item .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .dot-running { background: var(--green); }
-        .dot-off { background: var(--red); opacity: 0.6; }
-
-        /* ========================================
-           SIMULATION
-           ======================================== */
-        .sim-container {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            margin-bottom: 40px;
-        }
-
-        .sim-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 24px;
-            border-bottom: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.02);
-        }
-
-        .sim-stage-indicator {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .sim-stage-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            transition: background 0.3s;
-        }
-
-        .sim-stage-dot.active {
-            background: var(--accent);
-            box-shadow: 0 0 8px var(--accent);
-        }
-
-        .sim-stage-dot.completed {
-            background: var(--green);
-        }
-
-        .sim-stage-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-left: 8px;
-        }
-
-        .sim-progress {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .sim-body {
-            padding: 40px;
-            min-height: 450px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Action Labels */
-        .action-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .label-sales {
-            background: rgba(59,130,246,0.15);
-            color: #60a5fa;
-            border: 1px solid var(--blue-border);
-        }
-
-        .label-system {
-            background: rgba(6,182,212,0.15);
-            color: #22d3ee;
-            border: 1px solid var(--cyan-border);
-        }
-
-        .label-vetting {
-            background: rgba(245,158,11,0.15);
-            color: #fbbf24;
-            border: 1px solid var(--amber-border);
-        }
-
-        .label-fulfillment {
-            background: rgba(139,92,246,0.15);
-            color: #a78bfa;
-            border: 1px solid var(--purple-border);
-        }
-
-        .label-notification {
-            background: rgba(34,197,94,0.15);
-            color: #4ade80;
-            border: 1px solid var(--green-border);
-        }
-
-        .label-result {
-            background: rgba(251,191,36,0.15);
-            color: #fbbf24;
-            border: 1px solid rgba(251,191,36,0.4);
-        }
-
-        .label-retention {
-            background: rgba(239,68,68,0.15);
-            color: #f87171;
-            border: 1px solid rgba(239,68,68,0.4);
-        }
-
-        /* Screen content */
-        .screen-content {
-            width: 100%;
-            max-width: 720px;
-            text-align: center;
-        }
-
-        .screen-content.cyan-tint {
-            border-left: 3px solid var(--cyan);
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .screen-content.blue-tint {
-            border-left: 3px solid var(--blue);
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .screen-content.purple-tint {
-            border-left: 3px solid var(--purple);
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .screen-content.green-tint {
-            border-left: 3px solid var(--green);
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .screen-content.amber-tint {
-            border-left: 3px solid var(--amber);
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .screen-content.red-tint {
-            border-left: 3px solid var(--red);
-            padding-left: 20px;
-            text-align: left;
-        }
-
-        .sim-screen-title {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .sim-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 28px;
-            background: var(--gradient-1);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .sim-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 20px var(--cyan-glow);
-        }
-
-        .sim-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Product selection */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .product-card {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: border-color 0.3s, background 0.3s;
-            text-align: left;
-        }
-
-        .product-card:hover {
-            border-color: var(--accent);
-            background: var(--surface-hover);
-        }
-
-        .product-card.selected {
-            border-color: var(--accent);
-            background: var(--cyan-glow);
-        }
-
-        .product-card-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .product-card-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* Order form */
-        .order-form {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .order-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .order-row:last-child { border-bottom: none; }
-
-        .order-label {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .order-value {
-            font-size: 13px;
-            color: #fff;
-            font-weight: 500;
-        }
-
-        .order-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-pending {
-            background: rgba(245,158,11,0.15);
-            color: #fbbf24;
-        }
-
-        .status-approved {
-            background: rgba(34,197,94,0.15);
-            color: #4ade80;
-        }
-
-        .status-declined {
-            background: rgba(239,68,68,0.15);
-            color: #f87171;
-        }
-
-        .status-active {
-            background: rgba(6,182,212,0.15);
-            color: #22d3ee;
-        }
-
-        /* Terminal */
-        .terminal {
-            background: #0d1117;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 16px;
-            width: 100%;
-        }
-
-        .terminal-bar {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 14px;
-            background: rgba(255,255,255,0.04);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .terminal-dot.r { background: #ff5f57; }
-        .terminal-dot.y { background: #ffbd2e; }
-        .terminal-dot.g { background: #28c840; }
-
-        .terminal-title {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-left: 8px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-        }
-
-        .terminal-body {
-            padding: 16px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 13px;
-        }
-
-        .term-line {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 4px 0;
-            opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 0.4s, transform 0.4s;
-        }
-
-        .term-line.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .term-time {
-            color: var(--text-muted);
-            font-size: 11px;
-            min-width: 42px;
-        }
-
-        .term-check { color: var(--green); }
-        .term-warn { color: var(--amber); }
-        .term-fail { color: var(--red); }
-
-        .term-text { color: var(--text); }
-        .term-text.dim { color: var(--text-muted); }
-        .term-text.highlight { color: var(--accent-light); }
-
-        /* Branch decision */
-        .branch-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 16px 0;
-        }
-
-        .branch-card {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 20px;
-            cursor: pointer;
-            transition: border-color 0.3s, background 0.3s, transform 0.2s;
-        }
-
-        .branch-card:hover {
-            transform: translateY(-2px);
-        }
-
-        .branch-card.approve:hover {
-            border-color: var(--green);
-            background: var(--green-glow);
-        }
-
-        .branch-card.decline:hover {
-            border-color: var(--red);
-            background: rgba(239,68,68,0.08);
-        }
-
-        .branch-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .branch-card.approve .branch-title { color: #4ade80; }
-        .branch-card.decline .branch-title { color: #f87171; }
-
-        .branch-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        /* Fulfillment cards */
-        .fulfill-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 16px 0;
-        }
-
-        .fulfill-card {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 14px;
-            opacity: 0;
-            transform: translateY(8px);
-            transition: opacity 0.5s, transform 0.5s, border-color 0.3s;
-        }
-
-        .fulfill-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .fulfill-card.lit {
-            border-color: var(--green);
-            background: var(--green-glow);
-        }
-
-        .fulfill-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .fulfill-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* Retention card */
-        .retention-flow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-
-        .retention-node {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 12px 20px;
-            font-size: 13px;
-            color: var(--text);
-            transition: border-color 0.3s, background 0.3s;
-        }
-
-        .retention-node.active-node {
-            border-color: var(--accent);
-            background: var(--cyan-glow);
-            color: var(--accent-light);
-        }
-
-        .retention-node.alert-node {
-            border-color: var(--red);
-            background: rgba(239,68,68,0.1);
-            color: #f87171;
-        }
-
-        .retention-arrow {
-            color: var(--text-muted);
-            font-size: 18px;
-        }
-
-        /* Pipeline big label */
-        .pipeline-big-label {
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--accent-light);
-            margin-top: 16px;
-            padding: 10px 20px;
-            background: var(--cyan-glow);
-            border: 1px solid var(--cyan-border);
-            border-radius: 10px;
-        }
-
-        /* Stats summary in simulation */
-        .sim-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .sim-stat-item {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 14px;
-            text-align: center;
-        }
-
-        .sim-stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .sim-stat-label {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        /* ========================================
-           BEFORE / AFTER
-           ======================================== */
-        .ba-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-
-        .ba-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 32px;
-            backdrop-filter: blur(10px);
-        }
-
-        .ba-header {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-
-        .ba-header.red {
-            background: rgba(239,68,68,0.15);
-            color: #f87171;
-        }
-
-        .ba-header.green {
-            background: rgba(34,197,94,0.15);
-            color: #4ade80;
-        }
-
-        .ba-big {
-            font-size: 24px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .ba-detail {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .ba-steps { display: flex; flex-direction: column; gap: 10px; }
-
-        .ba-step {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .ba-step-icon {
-            color: var(--text-muted);
-            font-weight: 700;
-            flex-shrink: 0;
-            width: 20px;
-        }
-
-        .ba-card.after .ba-step-icon { color: var(--green); }
-
-        /* ========================================
-           ARCHITECTURE FLOW
-           ======================================== */
-        .arch-flow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            padding: 40px 20px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-        }
-
-        .arch-node {
-            background: var(--surface);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 14px 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            transition: all 0.3s;
-        }
-
-        .arch-node.highlight-node {
-            border-color: var(--accent);
-            background: var(--cyan-glow);
-            color: var(--accent-light);
-        }
-
-        .arch-node.green-node {
-            border-color: var(--green);
-            background: var(--green-glow);
-            color: #4ade80;
-        }
-
-        .arch-node.purple-node {
-            border-color: var(--purple);
-            background: var(--purple-glow);
-            color: #a78bfa;
-        }
-
-        .arch-arrow {
-            color: var(--text-muted);
-            font-size: 18px;
-        }
-
-        .arch-branch {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .arch-branch-label {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* ========================================
-           PM WORK GRID
-           ======================================== */
-        .pm-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .pm-card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.2s, border-color 0.2s;
-        }
-
-        .pm-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
-        }
-
-        .pm-card-icon { font-size: 28px; margin-bottom: 12px; }
-        .pm-card-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-
-        .pm-card-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.6;
-        }
-
-        /* ========================================
-           FOOTER
-           ======================================== */
-        .footer {
-            text-align: center;
-            padding: 60px 0;
-            border-top: 1px solid var(--glass-border);
-            margin-top: 40px;
-        }
-
-        .footer-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .footer-role {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .footer-links {
-            margin-top: 16px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .footer-link {
-            color: var(--accent-light);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-
-        .footer-link:hover { color: #fff; }
-
-        /* ========================================
-           RESPONSIVE
-           ======================================== */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 28px; }
-            .hero-stats { grid-template-columns: repeat(2, 1fr); }
-            .catalog-grid { grid-template-columns: 1fr; }
-            .ba-grid { grid-template-columns: 1fr; }
-            .pm-grid { grid-template-columns: 1fr; }
-            .product-grid { grid-template-columns: 1fr; }
-            .branch-container { grid-template-columns: 1fr; }
-            .fulfill-grid { grid-template-columns: 1fr; }
-            .sim-stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .sim-body { padding: 24px; }
-            .partner-context-grid { grid-template-columns: 1fr !important; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telkom Enterprise Automation Architecture — Portfolio Project</title>
+<style>
+/* ============================================
+   TELKOM SOUTH AFRICA BRAND TOKENS
+   ============================================ */
+:root {
+  --tk-blue: #008FE0;
+  --tk-deep-blue: #005288;
+  --tk-navy: #003F6A;
+  --tk-lime: #91E200;
+  --tk-lime-dark: #6DB300;
+  --tk-bg: #F3F4F5;
+  --tk-white: #FFFFFF;
+  --tk-border: #DADEE0;
+  --tk-text: #1A2B3C;
+  --tk-text-secondary: #5A6A7A;
+  --tk-icon-bg: #B8E3FF;
+  --tk-shadow: 2px 2px 4px rgba(46,63,75,0.15);
+  --tk-shadow-lg: 4px 4px 12px rgba(46,63,75,0.12);
+  --tk-radius: 8px;
+  --tk-radius-pill: 999px;
+  --tk-terminal-bg: #F8F9FA;
+  --tk-terminal-text: #1a1a2e;
+  --tk-red: #D9534F;
+  --tk-green: #3EAF4B;
+  --tk-amber: #F5A623;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--tk-text);
+  background: var(--tk-bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   STICKY HEADER
+   ============================================ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--tk-white);
+  border-bottom: 1px solid var(--tk-border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+  letter-spacing: -0.3px;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--tk-lime);
+  color: var(--tk-navy);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 16px;
+  border-radius: var(--tk-radius-pill);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   SECTION LAYOUT
+   ============================================ */
+.section-white { background: var(--tk-white); }
+.section-gray { background: var(--tk-bg); }
+
+.section-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tk-blue);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+
+.section-label::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 3px;
+  background: var(--tk-blue);
+  border-radius: 2px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--tk-deep-blue);
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-size: 17px;
+  color: var(--tk-text-secondary);
+  max-width: 720px;
+  line-height: 1.65;
+}
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero { text-align: center; }
+.hero .section-subtitle { margin: 0 auto 48px; }
+.hero .section-label { justify-content: center; }
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-top: 3px solid var(--tk-blue);
+  border-radius: var(--tk-radius);
+  padding: 24px 16px;
+  box-shadow: var(--tk-shadow);
+  text-align: center;
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--tk-deep-blue);
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: var(--tk-text-secondary);
+  font-weight: 500;
+}
+
+/* ============================================
+   CATALOG GRID
+   ============================================ */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.catalog-card {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  padding: 28px 24px;
+  box-shadow: var(--tk-shadow);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.catalog-card:hover {
+  box-shadow: var(--tk-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.catalog-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.catalog-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--tk-icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.catalog-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: var(--tk-deep-blue);
+}
+
+.catalog-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+}
+
+.catalog-card-count {
+  font-size: 13px;
+  color: var(--tk-blue);
+  font-weight: 600;
+}
+
+.catalog-list {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.catalog-list li {
+  font-size: 13.5px;
+  color: var(--tk-text-secondary);
+  padding: 5px 0;
+  border-bottom: 1px solid #F0F1F2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalog-list li:last-child { border-bottom: none; }
+
+.catalog-list li::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tk-lime-dark);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   SIMULATION
+   ============================================ */
+.sim-container {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  box-shadow: var(--tk-shadow-lg);
+  overflow: hidden;
+  margin-top: 40px;
+}
+
+.sim-progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--tk-border);
+  background: var(--tk-bg);
+}
+
+.sim-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--tk-border);
+  transition: background 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+
+.sim-dot.active {
+  background: var(--tk-blue);
+  transform: scale(1.3);
+}
+
+.sim-dot.completed {
+  background: var(--tk-lime-dark);
+}
+
+.sim-stage-label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--tk-deep-blue);
+  padding: 16px 24px 0;
+}
+
+.sim-screen {
+  display: none;
+  padding: 32px 32px 40px;
+  min-height: 380px;
+  animation: simFadeIn 0.4s ease;
+}
+
+.sim-screen.active { display: block; }
+
+@keyframes simFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sim-screen h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+  margin-bottom: 8px;
+}
+
+.sim-screen p {
+  font-size: 15px;
+  color: var(--tk-text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.sim-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: var(--tk-radius);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.sim-btn:active { transform: scale(0.97); }
+
+.sim-btn-primary {
+  background: var(--tk-blue);
+  color: #fff;
+}
+
+.sim-btn-primary:hover { background: #007ACC; }
+
+.sim-btn-approve {
+  background: var(--tk-green);
+  color: #fff;
+}
+
+.sim-btn-approve:hover { background: #359B3F; }
+
+.sim-btn-decline {
+  background: var(--tk-red);
+  color: #fff;
+}
+
+.sim-btn-decline:hover { background: #C0453E; }
+
+.sim-btn-secondary {
+  background: transparent;
+  color: var(--tk-blue);
+  border: 2px solid var(--tk-blue);
+}
+
+.sim-btn-secondary:hover { background: #E8F4FD; }
+
+.sim-btn-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Product Selection Cards */
+.product-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.product-card {
+  background: var(--tk-white);
+  border: 2px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover { border-color: var(--tk-blue); }
+.product-card.selected {
+  border-color: var(--tk-blue);
+  box-shadow: 0 0 0 3px rgba(0,143,224,0.15);
+}
+
+.product-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+  margin-bottom: 4px;
+}
+
+.product-card-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--tk-blue);
+}
+
+.product-card-period {
+  font-size: 12px;
+  color: var(--tk-text-secondary);
+}
+
+/* Terminal / Log */
+.sim-terminal {
+  background: var(--tk-terminal-bg);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  padding: 20px;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--tk-terminal-text);
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 16px 0 20px;
+}
+
+.sim-terminal .log-time {
+  color: #8899AA;
+  margin-right: 8px;
+}
+
+.sim-terminal .log-ok { color: var(--tk-green); font-weight: 600; }
+.sim-terminal .log-info { color: var(--tk-blue); font-weight: 600; }
+.sim-terminal .log-warn { color: var(--tk-amber); font-weight: 600; }
+.sim-terminal .log-err { color: var(--tk-red); font-weight: 600; }
+
+/* Fulfillment Cards */
+.fulfillment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.fulfillment-card {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  padding: 14px 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--tk-deep-blue);
+  transition: background 0.3s;
+}
+
+.fulfillment-card.active {
+  background: #E8F7E9;
+  border-color: var(--tk-green);
+  color: var(--tk-green);
+}
+
+/* Status Pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: var(--tk-radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pill-live { background: #E8F7E9; color: var(--tk-green); }
+.pill-processing { background: #E8F4FD; color: var(--tk-blue); }
+.pill-failed { background: #FDEDED; color: var(--tk-red); }
+.pill-pending { background: #FFF8E1; color: #B8860B; }
+
+/* Stats in simulation */
+.sim-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.sim-stat-mini {
+  background: var(--tk-bg);
+  border-radius: var(--tk-radius);
+  padding: 16px;
+  text-align: center;
+}
+
+.sim-stat-mini .mini-val {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--tk-deep-blue);
+}
+
+.sim-stat-mini .mini-lbl {
+  font-size: 12px;
+  color: var(--tk-text-secondary);
+}
+
+/* Summary list */
+.summary-block {
+  background: var(--tk-bg);
+  border-radius: var(--tk-radius);
+  padding: 20px 24px;
+  margin: 12px 0;
+}
+
+.summary-block h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+  margin-bottom: 10px;
+}
+
+.summary-block ul {
+  list-style: none;
+  padding: 0;
+}
+
+.summary-block ul li {
+  font-size: 13.5px;
+  color: var(--tk-text-secondary);
+  padding: 4px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.summary-block ul li::before {
+  content: '\2713';
+  color: var(--tk-green);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ============================================
+   BEFORE / AFTER
+   ============================================ */
+.ba-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.ba-card {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  overflow: hidden;
+  box-shadow: var(--tk-shadow);
+}
+
+.ba-card-header {
+  padding: 20px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ba-card-header.before { background: var(--tk-red); }
+.ba-card-header.after { background: var(--tk-green); }
+
+.ba-card-body {
+  padding: 24px;
+}
+
+.ba-card-body ul {
+  list-style: none;
+  padding: 0;
+}
+
+.ba-card-body ul li {
+  font-size: 14px;
+  color: var(--tk-text);
+  padding: 8px 0;
+  border-bottom: 1px solid #F0F1F2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ba-card-body ul li:last-child { border-bottom: none; }
+
+.ba-icon-x { color: var(--tk-red); font-weight: 700; font-size: 16px; }
+.ba-icon-check { color: var(--tk-green); font-weight: 700; font-size: 16px; }
+
+/* ============================================
+   ARCHITECTURE FLOW
+   ============================================ */
+.arch-flow {
+  margin-top: 40px;
+}
+
+.arch-primary {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.arch-node {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  padding: 16px 20px;
+  text-align: center;
+  box-shadow: var(--tk-shadow);
+  min-width: 140px;
+}
+
+.arch-node-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+}
+
+.arch-node-sub {
+  font-size: 11px;
+  color: var(--tk-text-secondary);
+  margin-top: 2px;
+}
+
+.arch-arrow {
+  font-size: 22px;
+  color: var(--tk-blue);
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+.arch-branch {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  flex-direction: column;
+}
+
+.arch-branch-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 12px;
+}
+
+.arch-branch-label {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: var(--tk-radius-pill);
+  margin-right: 6px;
+}
+
+.arch-branch-label.approve { background: #E8F7E9; color: var(--tk-green); }
+.arch-branch-label.decline { background: #FDEDED; color: var(--tk-red); }
+
+.arch-secondary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.arch-sec-card {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-left: 3px solid var(--tk-amber);
+  border-radius: var(--tk-radius);
+  padding: 16px 18px;
+  box-shadow: var(--tk-shadow);
+}
+
+.arch-sec-card .arch-trigger {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--tk-red);
+  margin-bottom: 4px;
+}
+
+.arch-sec-card .arch-response {
+  font-size: 13px;
+  color: var(--tk-text);
+  font-weight: 600;
+}
+
+/* ============================================
+   PM WORK GRID
+   ============================================ */
+.pm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.pm-card {
+  background: var(--tk-white);
+  border: 1px solid var(--tk-border);
+  border-radius: var(--tk-radius);
+  padding: 28px 24px;
+  box-shadow: var(--tk-shadow);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.pm-card:hover {
+  box-shadow: var(--tk-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.pm-card-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--tk-icon-bg);
+  color: var(--tk-deep-blue);
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.pm-card h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tk-deep-blue);
+  margin-bottom: 8px;
+}
+
+.pm-card p {
+  font-size: 13.5px;
+  color: var(--tk-text-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  background: var(--tk-navy);
+  color: #B8CDE0;
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.footer-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.footer-role {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tk-icon-bg);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.footer-link:hover { color: #fff; }
+
+.footer-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .stats-bar { grid-template-columns: repeat(3, 1fr); }
+  .catalog-grid, .pm-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-cards { grid-template-columns: repeat(2, 1fr); }
+  .fulfillment-grid { grid-template-columns: repeat(2, 1fr); }
+  .arch-secondary { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .header { padding: 0 16px; }
+  .section-inner { padding: 48px 16px; }
+  .section-title { font-size: 26px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .catalog-grid, .pm-grid { grid-template-columns: 1fr; }
+  .ba-grid { grid-template-columns: 1fr; }
+  .product-cards { grid-template-columns: 1fr; }
+  .fulfillment-grid { grid-template-columns: repeat(2, 1fr); }
+  .sim-screen { padding: 24px 20px 32px; }
+  .arch-primary { flex-direction: column; align-items: stretch; }
+  .arch-arrow { transform: rotate(90deg); text-align: center; }
+  .sim-stats-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-bar { grid-template-columns: 1fr; }
+  .stat-card .stat-value { font-size: 24px; }
+  .fulfillment-grid { grid-template-columns: 1fr; }
+  .header-title { font-size: 15px; }
+}
+</style>
 </head>
 <body>
 
-    <!-- ============================================
-         HERO
-         ============================================ -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-badge">Production Automation System &bull; Telecom Partner Ecosystem</div>
-            <h1>Enterprise Automation Architecture</h1>
-            <h2>30+ production workflows powering order processing, fulfillment, billing sync, credit vetting, and retention for a 500,000+ subscriber telecom partner across 19 directories</h2>
+<!-- ============================================
+     STICKY HEADER
+     ============================================ -->
+<header class="header">
+  <span class="header-title">Telkom Enterprise Automation</span>
+  <span class="header-badge">Portfolio Project</span>
+</header>
 
-            <div class="hero-stats">
-                <div class="stat-card">
-                    <div class="stat-number">833</div>
-                    <div class="stat-label">Paying SMBs (Vendasta)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">$5.7M</div>
-                    <div class="stat-label">Total monthly revenue</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">100%</div>
-                    <div class="stat-label">NRR (zero churn)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">$62K</div>
-                    <div class="stat-label">Vendasta billing/mo</div>
-                </div>
-            </div>
-            <div class="hero-stats" style="margin-top:12px;">
-                <div class="stat-card">
-                    <div class="stat-number">30+</div>
-                    <div class="stat-label">Production automations</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">6</div>
-                    <div class="stat-label">Automation categories</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">500K+</div>
-                    <div class="stat-label">Total subscribers</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Manual steps in order flow</div>
-                </div>
-            </div>
+<!-- ============================================
+     HERO SECTION
+     ============================================ -->
+<section class="section-white">
+  <div class="section-inner hero">
+    <div class="section-label">Telkom South Africa</div>
+    <h1 class="section-title">Enterprise Automation Architecture</h1>
+    <p class="section-subtitle">30+ production automations powering Telkom South Africa's order lifecycle &mdash; from sales submission to product activation to customer retention</p>
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value">833</div>
+        <div class="stat-label">Paying Businesses</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">$5.7M</div>
+        <div class="stat-label">Total Monthly Revenue</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">30+</div>
+        <div class="stat-label">Production Automations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">Net Revenue Retention</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">0%</div>
+        <div class="stat-label">Churn</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     AUTOMATION CATALOG
+     ============================================ -->
+<section class="section-gray">
+  <div class="section-inner">
+    <div class="section-label">Automation Catalog</div>
+    <h2 class="section-title">30+ Automations Across 6 Categories</h2>
+    <p class="section-subtitle">Every automation was discovered, designed, and shipped to eliminate manual work from Telkom's order-to-activation lifecycle.</p>
+    <div class="catalog-grid">
+
+      <!-- 1. Order Processing -->
+      <div class="catalog-card">
+        <div class="catalog-card-header">
+          <div class="catalog-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
+          </div>
+          <div>
+            <div class="catalog-card-name">Order Processing</div>
+            <div class="catalog-card-count">6 automations</div>
+          </div>
         </div>
-    </section>
+        <ul class="catalog-list">
+          <li>Submit Order to CPE</li>
+          <li>Credit Check Approve</li>
+          <li>Credit Check Fail</li>
+          <li>Subscriber ID Assignment</li>
+          <li>Program ID Assignment</li>
+          <li>Contract Push to Contract Billing</li>
+        </ul>
+      </div>
 
-    <!-- ============================================
-         PARTNER CONTEXT
-         ============================================ -->
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Partner Context</h2>
-            <p class="section-subtitle">Who this was built for and why it matters</p>
-            <div class="partner-context-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-                <div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:32px;backdrop-filter:blur(10px);">
-                    <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px;">THE PARTNER</div>
-                    <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">Telkom &mdash; YEP (Yellow Pages)</div>
-                    <div style="font-size:14px;color:var(--text-muted);line-height:1.7;">
-                        Telkom is South Africa's largest telecommunications company. Their YEP (Yellow Pages) digital division operates 19 business directories serving 20M+ users across the country. Vendasta powers the SMB product stack — websites, SEO, social media, advertising — for Telkom's 500,000+ business subscribers.
-                    </div>
-                </div>
-                <div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:32px;backdrop-filter:blur(10px);">
-                    <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent-light);margin-bottom:16px;">BUSINESS DATA</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                        <div>
-                            <div style="font-size:24px;font-weight:700;color:#fff;">833</div>
-                            <div style="font-size:12px;color:var(--text-muted);">Paying SMBs (Vendasta)</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:700;color:#fff;">$5.7M&ndash;$6.1M</div>
-                            <div style="font-size:12px;color:var(--text-muted);">Total monthly revenue</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:700;color:#fff;">$62K</div>
-                            <div style="font-size:12px;color:var(--text-muted);">Vendasta monthly billing</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:700;color:#fff;">100% NRR</div>
-                            <div style="font-size:12px;color:var(--text-muted);">Zero churn</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:700;color:#fff;">500,000+</div>
-                            <div style="font-size:12px;color:var(--text-muted);">Total subscribers</div>
-                        </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:700;color:#fff;">19</div>
-                            <div style="font-size:12px;color:var(--text-muted);">Business directories</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="margin-top:20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;padding:24px;backdrop-filter:blur(10px);">
-                <div style="font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--accent-light);margin-bottom:12px;">WHY THIS INTEGRATION EXISTS</div>
-                <div style="font-size:14px;color:var(--text-muted);line-height:1.7;">
-                    Telkom's YEP division needed to automate the entire order-to-fulfillment pipeline for their SMB product stack. With 500,000+ subscribers and growing, manual processes for order processing, credit vetting, fulfillment, and billing were creating delays, revenue leakage, and dropped orders. I designed 30+ automations that eliminated every manual step — from the moment a sales rep submits an order to the moment the SMB's product goes live, with built-in retention workflows when subscribers cancel.
-                </div>
-            </div>
+      <!-- 2. Fulfillment -->
+      <div class="catalog-card">
+        <div class="catalog-card-header">
+          <div class="catalog-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+          </div>
+          <div>
+            <div class="catalog-card-name">Fulfillment</div>
+            <div class="catalog-card-count">8 automations</div>
+          </div>
         </div>
-    </section>
+        <ul class="catalog-list">
+          <li>All-In-One WebExecutive</li>
+          <li>All-In-One WebPro</li>
+          <li>Banner Ads / MRECs</li>
+          <li>Web Basic</li>
+          <li>Facebook Campaigns</li>
+          <li>Google Adwords</li>
+          <li>Google Call Only</li>
+          <li>Google Display Network</li>
+        </ul>
+      </div>
 
-    <!-- ============================================
-         AUTOMATION CATALOG
-         ============================================ -->
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Automation Catalog</h2>
-            <p class="section-subtitle">Every automation I designed and deployed, organized by function</p>
-
-            <div class="catalog-grid">
-                <div class="catalog-card">
-                    <div class="catalog-icon">&#128230;</div>
-                    <div class="catalog-name">Order Processing</div>
-                    <div class="catalog-count">12 automations</div>
-                    <div class="catalog-desc">End-to-end order lifecycle from sales submission through credit vetting, approval, and processing.</div>
-                    <div class="catalog-items">
-                        <div class="catalog-item"><span class="dot dot-running"></span> Submit Order to CPE</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Submit Order to Proposal Builder</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Credit Check &mdash; Approve to CPE</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Credit Check &mdash; Approve to Proposal Builder</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Credit Check Fail &mdash; Decline Order</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Cancel Draft Order</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Cancel Renewal Order</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Order Fulfilled</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Order Declined &mdash; Sales Task</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Payment Failed &mdash; Auto Cancel</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Payment Info Changed</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Order Received via API</div>
-                    </div>
-                </div>
-
-                <div class="catalog-card">
-                    <div class="catalog-icon">&#9881;</div>
-                    <div class="catalog-name">Fulfillment</div>
-                    <div class="catalog-count">8 automations</div>
-                    <div class="catalog-desc">Auto-kick fulfillment projects in Task Manager when products activate. Each product type has its own automation.</div>
-                    <div class="catalog-items">
-                        <div class="catalog-item"><span class="dot dot-running"></span> All-In-One WebExecutive</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> All-In-One WebPro</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Banner Ads (MRECs)</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Design Studio &mdash; Web Basic</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Facebook Campaigns</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Google Adwords Campaigns</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Google Call Only Campaigns</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Google Display Network</div>
-                    </div>
-                </div>
-
-                <div class="catalog-card">
-                    <div class="catalog-icon">&#128176;</div>
-                    <div class="catalog-name">Contract Billing Sync</div>
-                    <div class="catalog-count">5 automations</div>
-                    <div class="catalog-desc">Two-way sync between platform and partner's Contract Billing system. Audit, push, and reconciliation workflows.</div>
-                    <div class="catalog-items">
-                        <div class="catalog-item"><span class="dot dot-running"></span> Audit Report (Platform vs Contract Billing)</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Push/Update Contracts</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Push/Update Customer Information</div>
-                        <div class="catalog-item"><span class="dot dot-off"></span> Deactivation Sync to Contract Billing</div>
-                        <div class="catalog-item"><span class="dot dot-off"></span> Activation Sync to Contract Billing</div>
-                    </div>
-                </div>
-
-                <div class="catalog-card">
-                    <div class="catalog-icon">&#128247;</div>
-                    <div class="catalog-name">Product Management</div>
-                    <div class="catalog-count">3 automations</div>
-                    <div class="catalog-desc">Account-level product lifecycle &mdash; activation, self-healing deactivation, and timed deactivation to prevent double billing.</div>
-                    <div class="catalog-items">
-                        <div class="catalog-item"><span class="dot dot-running"></span> Add PrintApp to Account</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Deactivate-then-Activate PrintApp (self-healing)</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Deactivate Google Profile Claim after 45 days</div>
-                    </div>
-                </div>
-
-                <div class="catalog-card">
-                    <div class="catalog-icon">&#128337;</div>
-                    <div class="catalog-name">Retention</div>
-                    <div class="catalog-count">2 automations</div>
-                    <div class="catalog-desc">When an order is cancelled, the retention team is notified immediately and a sales task is created with a 2-day SLA.</div>
-                    <div class="catalog-items">
-                        <div class="catalog-item"><span class="dot dot-running"></span> Customer Retention &mdash; 2-day SLA task</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Credit Vet for Business (TransUnion)</div>
-                    </div>
-                </div>
-
-                <div class="catalog-card">
-                    <div class="catalog-icon">&#128075;</div>
-                    <div class="catalog-name">Onboarding &amp; Identity</div>
-                    <div class="catalog-count">3 automations</div>
-                    <div class="catalog-desc">Account creation, subscriber ID assignment, and product deactivation webhooks for the partner ecosystem.</div>
-                    <div class="catalog-items">
-                        <div class="catalog-item"><span class="dot dot-running"></span> Welcome Account</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Assign Subscriber ID to Account</div>
-                        <div class="catalog-item"><span class="dot dot-running"></span> Product Deactivation Webhook</div>
-                    </div>
-                </div>
-            </div>
+      <!-- 3. Billing & Revenue -->
+      <div class="catalog-card">
+        <div class="catalog-card-header">
+          <div class="catalog-icon">
+            <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+          </div>
+          <div>
+            <div class="catalog-card-name">Billing &amp; Revenue</div>
+            <div class="catalog-card-count">5 automations</div>
+          </div>
         </div>
-    </section>
+        <ul class="catalog-list">
+          <li>Payment Failed Auto-Cancel</li>
+          <li>Contract Billing Sync</li>
+          <li>Billing Audit Report</li>
+          <li>Month-End Reconciliation</li>
+          <li>Commission Report</li>
+        </ul>
+      </div>
 
-    <!-- ============================================
-         INTERACTIVE SIMULATION
-         ============================================ -->
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Order Lifecycle Simulation</h2>
-            <p class="section-subtitle">Walk through a complete order &mdash; from sales submission through credit vetting, fulfillment, and retention</p>
-
-            <div class="sim-container">
-                <div class="sim-header">
-                    <div class="sim-stage-indicator">
-                        <div class="sim-stage-dot active" id="dot-1"></div>
-                        <div class="sim-stage-dot" id="dot-2"></div>
-                        <div class="sim-stage-dot" id="dot-3"></div>
-                        <div class="sim-stage-dot" id="dot-4"></div>
-                        <span class="sim-stage-label" id="stage-label">Stage 1: Order Submission</span>
-                    </div>
-                    <div class="sim-progress" id="sim-progress">Screen 1 of 10</div>
-                </div>
-                <div class="sim-body" id="sim-body">
-                    <!-- Rendered by JS -->
-                </div>
-            </div>
+      <!-- 4. Customer Retention -->
+      <div class="catalog-card">
+        <div class="catalog-card-header">
+          <div class="catalog-icon">
+            <svg viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>
+          </div>
+          <div>
+            <div class="catalog-card-name">Customer Retention</div>
+            <div class="catalog-card-count">3 automations</div>
+          </div>
         </div>
-    </section>
+        <ul class="catalog-list">
+          <li>Order Cancelled &rarr; Retention Notification</li>
+          <li>2-Day SLA Sales Task</li>
+          <li>Re-engagement Campaign</li>
+        </ul>
+      </div>
 
-    <!-- ============================================
-         BEFORE / AFTER
-         ============================================ -->
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Before &amp; After</h2>
-            <p class="section-subtitle">Manual handoffs replaced with automated workflows</p>
-            <div class="ba-grid">
-                <div class="ba-card before">
-                    <div class="ba-header red">BEFORE</div>
-                    <div class="ba-big">Manual order lifecycle</div>
-                    <div class="ba-detail">Multiple teams, email handoffs, days to fulfill</div>
-                    <div class="ba-steps">
-                        <div class="ba-step"><span class="ba-step-icon">1.</span> Sales rep submits order via email to operations</div>
-                        <div class="ba-step"><span class="ba-step-icon">2.</span> AR team runs credit check manually with TransUnion</div>
-                        <div class="ba-step"><span class="ba-step-icon">3.</span> Ops team creates fulfillment project in Task Manager by hand</div>
-                        <div class="ba-step"><span class="ba-step-icon">4.</span> Contract Billing updated manually per order</div>
-                        <div class="ba-step"><span class="ba-step-icon">5.</span> Product activated on account by support team</div>
-                        <div class="ba-step"><span class="ba-step-icon">6.</span> If payment fails, no one notices until end of month</div>
-                        <div class="ba-step"><span class="ba-step-icon">7.</span> Cancellations lost &mdash; retention team never notified</div>
-                    </div>
-                </div>
-                <div class="ba-card after">
-                    <div class="ba-header green">AFTER (AUTOMATED)</div>
-                    <div class="ba-big">30+ automations, 0 manual steps</div>
-                    <div class="ba-detail">End-to-end automated with real-time notifications</div>
-                    <div class="ba-steps">
-                        <div class="ba-step"><span class="ba-step-icon">&#10003;</span> Order submitted &rarr; credit vetting fires automatically</div>
-                        <div class="ba-step"><span class="ba-step-icon">&#10003;</span> Credit approved &rarr; order routes to CPE or Proposal Builder</div>
-                        <div class="ba-step"><span class="ba-step-icon">&#10003;</span> Product activated &rarr; fulfillment project auto-created</div>
-                        <div class="ba-step"><span class="ba-step-icon">&#10003;</span> Contract Billing synced in real-time (audit automation catches drift)</div>
-                        <div class="ba-step"><span class="ba-step-icon">&#10003;</span> Payment fails &rarr; order auto-cancelled, sales notified</div>
-                        <div class="ba-step"><span class="ba-step-icon">&#10003;</span> Order cancelled &rarr; retention team notified with 2-day SLA task</div>
-                    </div>
-                </div>
-            </div>
+      <!-- 5. Account Lifecycle -->
+      <div class="catalog-card">
+        <div class="catalog-card-header">
+          <div class="catalog-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div>
+            <div class="catalog-card-name">Account Lifecycle</div>
+            <div class="catalog-card-count">5 automations</div>
+          </div>
         </div>
-    </section>
+        <ul class="catalog-list">
+          <li>Welcome Account</li>
+          <li>Assign Subscriber ID</li>
+          <li>Product Deactivation Webhook</li>
+          <li>Self-Healing Product Activation</li>
+          <li>Account Data Cleanup</li>
+        </ul>
+      </div>
 
-    <!-- ============================================
-         ARCHITECTURE
-         ============================================ -->
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Architecture</h2>
-            <p class="section-subtitle">How 30+ automations connect across the order lifecycle</p>
-            <div class="arch-flow">
-                <div class="arch-node highlight-node">Sales Submits Order</div>
-                <span class="arch-arrow">&rarr;</span>
-                <div class="arch-node">Credit Vetting (TransUnion)</div>
-                <span class="arch-arrow">&rarr;</span>
-                <div class="arch-branch">
-                    <div class="arch-node green-node">Approve &rarr; CPE</div>
-                    <div class="arch-branch-label">or</div>
-                    <div class="arch-node" style="border-color:var(--red);color:#f87171;">Decline &rarr; Notify</div>
-                </div>
-                <span class="arch-arrow">&rarr;</span>
-                <div class="arch-node purple-node">Fulfillment (8 product types)</div>
-                <span class="arch-arrow">&rarr;</span>
-                <div class="arch-node">Contract Billing Sync</div>
-                <span class="arch-arrow">&rarr;</span>
-                <div class="arch-node highlight-node">Product Live</div>
-            </div>
-            <div style="text-align:center;margin-top:20px;">
-                <div style="display:inline-block;padding:10px 20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:10px;font-size:13px;color:var(--text-muted);">
-                    Payment Fails &rarr; Auto-Cancel &nbsp;&bull;&nbsp; Order Cancelled &rarr; Retention (2-day SLA) &nbsp;&bull;&nbsp; Billing Drift &rarr; Audit Report
-                </div>
-            </div>
+      <!-- 6. Data & Reporting -->
+      <div class="catalog-card">
+        <div class="catalog-card-header">
+          <div class="catalog-icon">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          </div>
+          <div>
+            <div class="catalog-card-name">Data &amp; Reporting</div>
+            <div class="catalog-card-count">3+ automations</div>
+          </div>
         </div>
-    </section>
+        <ul class="catalog-list">
+          <li>Orders Audit Report (Kele's Report)</li>
+          <li>TRUD Data Reconciliation</li>
+          <li>YepSync Data Migration</li>
+        </ul>
+      </div>
 
-    <!-- ============================================
-         PM WORK
-         ============================================ -->
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Product Management Work</h2>
-            <p class="section-subtitle">What it took to design and operate this automation system</p>
-            <div class="pm-grid">
-                <div class="pm-card">
-                    <div class="pm-card-icon">&#128269;</div>
-                    <div class="pm-card-title">Workflow Discovery</div>
-                    <div class="pm-card-desc">Mapped every manual step in the order-to-fulfillment pipeline. Identified 7 handoff points where orders stalled or dropped between teams.</div>
-                </div>
-                <div class="pm-card">
-                    <div class="pm-card-icon">&#128221;</div>
-                    <div class="pm-card-title">Automation Design</div>
-                    <div class="pm-card-desc">Designed 30+ automations across 6 categories. Each automation has defined triggers, actions, tags, and audit trails so every state change is traceable.</div>
-                </div>
-                <div class="pm-card">
-                    <div class="pm-card-icon">&#128260;</div>
-                    <div class="pm-card-title">Branching Logic</div>
-                    <div class="pm-card-desc">Built decision trees for credit vetting (approve/decline), order routing (CPE vs Proposal Builder), and payment failure handling (auto-cancel + notify).</div>
-                </div>
-                <div class="pm-card">
-                    <div class="pm-card-icon">&#128176;</div>
-                    <div class="pm-card-title">Billing Reconciliation</div>
-                    <div class="pm-card-desc">Created audit automation that compares platform state against Contract Billing. Catches billing drift before it becomes a revenue leak or partner dispute.</div>
-                </div>
-                <div class="pm-card">
-                    <div class="pm-card-icon">&#128337;</div>
-                    <div class="pm-card-title">Retention Engineering</div>
-                    <div class="pm-card-desc">Designed retention workflow: order cancelled &rarr; retention team notified instantly &rarr; sales task created with 2-day due date. No cancellation goes unnoticed.</div>
-                </div>
-                <div class="pm-card">
-                    <div class="pm-card-icon">&#128296;</div>
-                    <div class="pm-card-title">Self-Healing Design</div>
-                    <div class="pm-card-desc">Built self-healing automations: if a product activation fails, the system deactivates and re-activates automatically. Prevents support ticket escalation.</div>
-                </div>
-            </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     INTERACTIVE SIMULATION
+     ============================================ -->
+<section class="section-white">
+  <div class="section-inner">
+    <div class="section-label">Interactive Simulation</div>
+    <h2 class="section-title">Walk Through the Automation</h2>
+    <p class="section-subtitle">Click through a real order lifecycle &mdash; from sales rep product selection to fulfillment, payment failure, and retention recovery.</p>
+
+    <div class="sim-container">
+      <!-- Progress Dots -->
+      <div class="sim-progress-bar">
+        <div class="sim-dot active" data-screen="1"></div>
+        <div class="sim-dot" data-screen="2"></div>
+        <div class="sim-dot" data-screen="3"></div>
+        <div class="sim-dot" data-screen="4"></div>
+        <div class="sim-dot" data-screen="5"></div>
+        <div class="sim-dot" data-screen="6"></div>
+        <div class="sim-dot" data-screen="7"></div>
+        <div class="sim-dot" data-screen="8"></div>
+        <div class="sim-dot" data-screen="9"></div>
+        <div class="sim-dot" data-screen="10"></div>
+      </div>
+
+      <div class="sim-stage-label" id="simStageLabel">Stage 1 of 10 &mdash; Product Selection</div>
+
+      <!-- Screen 1: Sales Rep Selects Product -->
+      <div class="sim-screen active" data-screen="1">
+        <h3>Sales Rep Selects a Product</h3>
+        <p>A Telkom sales rep is onboarding <strong>BrightSmile Dental (Cape Town)</strong>. Choose a digital product to activate for this small and medium business:</p>
+        <div class="product-cards">
+          <div class="product-card" data-product="WebExecutive" onclick="selectProduct(this)">
+            <div class="product-card-name">All-In-One WebExecutive</div>
+            <div class="product-card-price">R1,499</div>
+            <div class="product-card-period">/month</div>
+          </div>
+          <div class="product-card" data-product="WebPro" onclick="selectProduct(this)">
+            <div class="product-card-name">All-In-One WebPro</div>
+            <div class="product-card-price">R899</div>
+            <div class="product-card-period">/month</div>
+          </div>
+          <div class="product-card" data-product="Facebook" onclick="selectProduct(this)">
+            <div class="product-card-name">Facebook Campaign</div>
+            <div class="product-card-price">R599</div>
+            <div class="product-card-period">/month</div>
+          </div>
         </div>
-    </section>
-
-    <!-- ============================================
-         FOOTER
-         ============================================ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-name">Sangeetha K</div>
-            <div class="footer-role">Product Manager &mdash; Integrations &amp; Professional Services</div>
-            <div class="footer-links">
-                <a href="https://github.com/Sangythek190" class="footer-link" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://linkedin.com/in/SangeethaK" class="footer-link" target="_blank" rel="noopener">LinkedIn</a>
-            </div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" id="btnSubmitOrder" onclick="goScreen(2)" disabled>Submit Order</button>
         </div>
-    </footer>
+      </div>
 
-    <!-- ============================================
-         SIMULATION ENGINE
-         ============================================ -->
-    <script>
-    (function() {
-        'use strict';
+      <!-- Screen 2: Submit Order to CPE -->
+      <div class="sim-screen" data-screen="2">
+        <h3>Submit Order to CPE</h3>
+        <p>The <strong>Submit Order to CPE</strong> automation fires immediately. No human touches the order.</p>
+        <div class="sim-terminal" id="terminal2"></div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" id="btnToCreditVet" onclick="goScreen(3)" disabled>Continue to Credit Vetting</button>
+        </div>
+      </div>
 
-        let currentScreen = 0;
-        let selectedProduct = null;
-        let creditDecision = null;
+      <!-- Screen 3: TransUnion Credit Vetting -->
+      <div class="sim-screen" data-screen="3">
+        <h3>TransUnion Credit Vetting</h3>
+        <p>Telkom's credit vetting automation queries <strong>TransUnion South Africa</strong> for BrightSmile Dental. The result determines whether the order proceeds or is declined.</p>
+        <div class="sim-terminal">
+          <div><span class="log-time">09:14:02</span><span class="log-info">[CREDIT]</span> Initiating TransUnion credit check...</div>
+          <div><span class="log-time">09:14:03</span><span class="log-info">[CREDIT]</span> Business: BrightSmile Dental (Cape Town)</div>
+          <div><span class="log-time">09:14:04</span><span class="log-info">[CREDIT]</span> Registration: 2018/234567/07</div>
+          <div><span class="log-time">09:14:06</span><span class="log-info">[CREDIT]</span> TransUnion response received. Awaiting decision...</div>
+        </div>
+        <p style="font-weight:600; color: var(--tk-deep-blue);">Choose the credit vetting outcome:</p>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-approve" onclick="creditDecision('approve')">Approve</button>
+          <button class="sim-btn sim-btn-decline" onclick="creditDecision('decline')">Decline</button>
+        </div>
+      </div>
 
-        const products = {
-            webexec: { name: 'All-In-One WebExecutive', short: 'AIOWE', price: 'R1,499/mo' },
-            webpro: { name: 'All-In-One WebPro', short: 'AIOWP', price: 'R899/mo' },
-            fbcampaign: { name: 'Facebook Campaign', short: 'FBA', price: 'R599/mo' }
-        };
+      <!-- Screen 4: Credit Result -->
+      <div class="sim-screen" data-screen="4">
+        <h3 id="creditResultTitle"></h3>
+        <p id="creditResultDesc"></p>
+        <div class="sim-terminal" id="terminal4"></div>
+        <div class="sim-btn-group" id="creditResultBtns"></div>
+      </div>
 
-        const stageMap = [
-            { stage: 1, label: 'Stage 1: Order Submission' },
-            { stage: 1, label: 'Stage 1: Order Submission' },
-            { stage: 2, label: 'Stage 2: Credit Vetting' },
-            { stage: 2, label: 'Stage 2: Credit Vetting' },
-            { stage: 3, label: 'Stage 3: Fulfillment' },
-            { stage: 3, label: 'Stage 3: Fulfillment' },
-            { stage: 3, label: 'Stage 3: Fulfillment' },
-            { stage: 4, label: 'Stage 4: Lifecycle' },
-            { stage: 4, label: 'Stage 4: Lifecycle' },
-            { stage: 4, label: 'Stage 4: Lifecycle' }
-        ];
+      <!-- Screen 5: Fulfillment Triggered -->
+      <div class="sim-screen" data-screen="5">
+        <h3>Fulfillment Triggered</h3>
+        <p>Credit approved. The fulfillment engine auto-kicks for the selected product. Telkom supports <strong>8 product types</strong> &mdash; each with its own dedicated automation:</p>
+        <div class="fulfillment-grid" id="fulfillmentGrid">
+          <div class="fulfillment-card" data-type="WebExecutive">WebExecutive</div>
+          <div class="fulfillment-card" data-type="WebPro">WebPro</div>
+          <div class="fulfillment-card" data-type="BannerAds">Banner Ads / MRECs</div>
+          <div class="fulfillment-card" data-type="WebBasic">Web Basic</div>
+          <div class="fulfillment-card" data-type="Facebook">Facebook Campaigns</div>
+          <div class="fulfillment-card" data-type="Adwords">Google Adwords</div>
+          <div class="fulfillment-card" data-type="CallOnly">Google Call Only</div>
+          <div class="fulfillment-card" data-type="DisplayNetwork">Google Display Network</div>
+        </div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" onclick="goScreen(6)">Run Fulfillment Pipeline</button>
+        </div>
+      </div>
 
-        const body = document.getElementById('sim-body');
-        const progressEl = document.getElementById('sim-progress');
-        const stageLabel = document.getElementById('stage-label');
+      <!-- Screen 6: Fulfillment Pipeline Running -->
+      <div class="sim-screen" data-screen="6">
+        <h3>Fulfillment Pipeline Running</h3>
+        <p>Task Manager executes the fulfillment workflow. Watch each step complete automatically:</p>
+        <div class="sim-terminal" id="terminal6"></div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" id="btnToLive" onclick="goScreen(7)" disabled>View Product Live</button>
+        </div>
+      </div>
 
-        function prod() { return products[selectedProduct] || products.webexec; }
+      <!-- Screen 7: Product Live -->
+      <div class="sim-screen" data-screen="7">
+        <h3>Product Live</h3>
+        <p><strong>BrightSmile Dental</strong> is now active on Telkom's platform. Zero manual steps from order to activation.</p>
+        <div style="margin: 16px 0;">
+          <span class="status-pill pill-live">LIVE</span>
+        </div>
+        <div class="sim-stats-row">
+          <div class="sim-stat-mini">
+            <div class="mini-val" id="liveProduct">--</div>
+            <div class="mini-lbl">Product</div>
+          </div>
+          <div class="sim-stat-mini">
+            <div class="mini-val" id="livePrice">--</div>
+            <div class="mini-lbl">Monthly</div>
+          </div>
+          <div class="sim-stat-mini">
+            <div class="mini-val">0</div>
+            <div class="mini-lbl">Manual Steps</div>
+          </div>
+        </div>
+        <div class="sim-terminal">
+          <div><span class="log-time">09:16:12</span><span class="log-ok">[BILLING]</span> Contract pushed to Contract Billing</div>
+          <div><span class="log-time">09:16:13</span><span class="log-ok">[BILLING]</span> Subscriber ID: TLK-2024-08847</div>
+          <div><span class="log-time">09:16:14</span><span class="log-ok">[BILLING]</span> Program ID assigned. Billing active.</div>
+          <div><span class="log-time">09:16:15</span><span class="log-ok">[ACCOUNT]</span> Welcome email sent to BrightSmile Dental</div>
+        </div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" onclick="goScreen(8)">Simulate Payment Failure</button>
+        </div>
+      </div>
 
-        function updateHeader() {
-            const info = stageMap[currentScreen];
-            stageLabel.textContent = info.label;
-            progressEl.textContent = 'Screen ' + (currentScreen + 1) + ' of 10';
+      <!-- Screen 8: Payment Failure -->
+      <div class="sim-screen" data-screen="8">
+        <h3>Payment Failure Detected</h3>
+        <p>Three months later, BrightSmile Dental's payment fails. The <strong>Payment Failed Auto-Cancel</strong> automation fires instantly.</p>
+        <div style="margin: 16px 0;">
+          <span class="status-pill pill-failed">PAYMENT FAILED</span>
+        </div>
+        <div class="sim-terminal">
+          <div><span class="log-time">12:41:08</span><span class="log-err">[BILLING]</span> Payment failed for BrightSmile Dental</div>
+          <div><span class="log-time">12:41:09</span><span class="log-err">[BILLING]</span> Invoice #INV-2024-34521 &mdash; R<span id="failedAmount">--</span> overdue</div>
+          <div><span class="log-time">12:41:10</span><span class="log-warn">[AUTO-CANCEL]</span> Payment Failed Auto-Cancel triggered</div>
+          <div><span class="log-time">12:41:11</span><span class="log-warn">[AUTO-CANCEL]</span> Grace period: 0 days (policy: immediate)</div>
+          <div><span class="log-time">12:41:12</span><span class="log-err">[AUTO-CANCEL]</span> Product deactivated via webhook</div>
+          <div><span class="log-time">12:41:13</span><span class="log-info">[RETENTION]</span> Order Cancelled &rarr; Retention Notification sent</div>
+        </div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" onclick="goScreen(9)">View Retention Response</button>
+        </div>
+      </div>
 
-            for (let i = 1; i <= 4; i++) {
-                const dot = document.getElementById('dot-' + i);
-                dot.className = 'sim-stage-dot';
-                if (i < info.stage) dot.classList.add('completed');
-                else if (i === info.stage) dot.classList.add('active');
-            }
-        }
+      <!-- Screen 9: Retention 2-Day SLA -->
+      <div class="sim-screen" data-screen="9">
+        <h3>Retention: 2-Day SLA Task</h3>
+        <p>The <strong>2-Day SLA Sales Task</strong> automation creates a high-priority task for the assigned sales rep. They have 48 hours to contact BrightSmile Dental and recover the account.</p>
+        <div style="margin: 16px 0;">
+          <span class="status-pill pill-pending">2-DAY SLA ACTIVE</span>
+        </div>
+        <div class="sim-terminal">
+          <div><span class="log-time">12:41:14</span><span class="log-warn">[RETENTION]</span> 2-Day SLA Sales Task created</div>
+          <div><span class="log-time">12:41:15</span><span class="log-info">[RETENTION]</span> Assigned to: Sales Rep &mdash; Thabo M.</div>
+          <div><span class="log-time">12:41:16</span><span class="log-info">[RETENTION]</span> Business: BrightSmile Dental (Cape Town)</div>
+          <div><span class="log-time">12:41:17</span><span class="log-info">[RETENTION]</span> Deadline: 48 hours from cancellation</div>
+          <div><span class="log-time">12:41:18</span><span class="log-warn">[RETENTION]</span> Re-engagement campaign queued if no contact in 24h</div>
+          <div><span class="log-time">12:41:19</span><span class="log-ok">[RETENTION]</span> Self-healing activation ready if payment resolved</div>
+        </div>
+        <div class="sim-btn-group">
+          <button class="sim-btn sim-btn-primary" onclick="goScreen(10)">View Summary</button>
+        </div>
+      </div>
 
-        function render(html) {
-            body.innerHTML = html;
-            body.style.opacity = '0';
-            requestAnimationFrame(function() {
-                body.style.transition = 'opacity 0.4s';
-                body.style.opacity = '1';
-            });
-            updateHeader();
-        }
+      <!-- Screen 10: Summary -->
+      <div class="sim-screen" data-screen="10">
+        <h3>Simulation Complete</h3>
+        <p>You just walked through Telkom South Africa's end-to-end automated order lifecycle. Here is what you saw &mdash; and what the Product Manager built.</p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px;">
+          <div class="summary-block">
+            <h4>What You Saw</h4>
+            <ul>
+              <li>Sales rep selects product for a small and medium business</li>
+              <li>Order submitted to CPE automatically</li>
+              <li>TransUnion credit vetting with approve/decline branching</li>
+              <li>Fulfillment auto-kicks for the correct product type</li>
+              <li>Contract Billing sync and product activation</li>
+              <li>Payment failure triggers auto-cancel</li>
+              <li>Retention workflow with 2-day SLA enforcement</li>
+              <li>Self-healing activation if payment resolves</li>
+            </ul>
+          </div>
+          <div class="summary-block">
+            <h4>What the Product Manager Did</h4>
+            <ul>
+              <li>Discovered 30+ workflow gaps across 6 categories</li>
+              <li>Designed branching logic for credit approve/decline paths</li>
+              <li>Built 8 product-specific fulfillment automations</li>
+              <li>Engineered billing reconciliation and audit systems</li>
+              <li>Created retention workflows with SLA enforcement</li>
+              <li>Designed self-healing product activation</li>
+              <li>Achieved 100% Net Revenue Retention, 0% churn</li>
+              <li>Scaled to 833 paying businesses, $5.7M monthly revenue</li>
+            </ul>
+          </div>
+        </div>
+        <div class="sim-btn-group" style="margin-top: 20px;">
+          <button class="sim-btn sim-btn-secondary" onclick="resetSim()">Restart Simulation</button>
+        </div>
+      </div>
 
-        // ===== SCREEN 1: Select Product =====
-        function screen1() {
-            render(
-                '<div class="screen-content">' +
-                '<div class="sim-screen-title">Sales Rep Selects Product for SMB</div>' +
-                '<p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">A sales rep in the partner ecosystem is creating an order for a local business subscriber.</p>' +
-                '<div class="product-grid">' +
-                    '<div class="product-card" data-prod="webexec" onclick="window.__selectProd(\'webexec\')">' +
-                        '<div class="product-card-name">All-In-One WebExecutive</div>' +
-                        '<div class="product-card-desc">Premium website + SEO + social + ads bundle. R1,499/mo.</div>' +
-                    '</div>' +
-                    '<div class="product-card" data-prod="webpro" onclick="window.__selectProd(\'webpro\')">' +
-                        '<div class="product-card-name">All-In-One WebPro</div>' +
-                        '<div class="product-card-desc">Website + basic SEO + social media. R899/mo.</div>' +
-                    '</div>' +
-                    '<div class="product-card" data-prod="fbcampaign" onclick="window.__selectProd(\'fbcampaign\')">' +
-                        '<div class="product-card-name">Facebook Campaign</div>' +
-                        '<div class="product-card-desc">Managed Facebook advertising. R599/mo.</div>' +
-                    '</div>' +
-                '</div>' +
-                '<button class="sim-btn" id="btn-submit" disabled onclick="window.__simNext()">Submit Order &#8594;</button>' +
-                '</div>'
-            );
-        }
+    </div>
+  </div>
+</section>
 
-        window.__selectProd = function(key) {
-            selectedProduct = key;
-            document.querySelectorAll('.product-card').forEach(function(c) { c.classList.remove('selected'); });
-            document.querySelector('[data-prod="' + key + '"]').classList.add('selected');
-            document.getElementById('btn-submit').disabled = false;
-        };
+<!-- ============================================
+     BEFORE & AFTER
+     ============================================ -->
+<section class="section-gray">
+  <div class="section-inner">
+    <div class="section-label">Impact</div>
+    <h2 class="section-title">Before &amp; After Automation</h2>
+    <p class="section-subtitle">The transformation from manual, multi-team processes to fully automated end-to-end workflows.</p>
+    <div class="ba-grid">
+      <div class="ba-card">
+        <div class="ba-card-header before">Before: Manual Process</div>
+        <div class="ba-card-body">
+          <ul>
+            <li><span class="ba-icon-x">&times;</span>7 manual steps per order</li>
+            <li><span class="ba-icon-x">&times;</span>Multiple teams involved in handoffs</li>
+            <li><span class="ba-icon-x">&times;</span>Email-based order routing</li>
+            <li><span class="ba-icon-x">&times;</span>Days to fulfill a single product</li>
+            <li><span class="ba-icon-x">&times;</span>No automated credit vetting</li>
+            <li><span class="ba-icon-x">&times;</span>Manual billing reconciliation</li>
+            <li><span class="ba-icon-x">&times;</span>Cancelled accounts lost permanently</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ba-card">
+        <div class="ba-card-header after">After: Fully Automated</div>
+        <div class="ba-card-body">
+          <ul>
+            <li><span class="ba-icon-check">&#10003;</span>30+ production automations</li>
+            <li><span class="ba-icon-check">&#10003;</span>0 manual steps in the critical path</li>
+            <li><span class="ba-icon-check">&#10003;</span>End-to-end automated order lifecycle</li>
+            <li><span class="ba-icon-check">&#10003;</span>Minutes from order to activation</li>
+            <li><span class="ba-icon-check">&#10003;</span>TransUnion credit vetting with branching</li>
+            <li><span class="ba-icon-check">&#10003;</span>Automated billing sync and audit reports</li>
+            <li><span class="ba-icon-check">&#10003;</span>Retention workflows with 2-day SLA</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        // ===== SCREEN 2: Order Submitted =====
-        function screen2() {
-            render(
-                '<div class="screen-content cyan-tint">' +
-                '<div class="action-label label-system">&#9881;&#65039; AUTOMATION TRIGGERED</div>' +
-                '<div class="sim-screen-title">SUBMIT Order to CPE</div>' +
-                '<div class="order-form">' +
-                    '<div class="order-row"><span class="order-label">Automation</span><span class="order-value">Submit Order to CPE</span></div>' +
-                    '<div class="order-row"><span class="order-label">Trigger</span><span class="order-value">Sales submits order</span></div>' +
-                    '<div class="order-row"><span class="order-label">Product</span><span class="order-value">' + prod().name + '</span></div>' +
-                    '<div class="order-row"><span class="order-label">SMB</span><span class="order-value">BrightSmile Dental (Cape Town)</span></div>' +
-                    '<div class="order-row"><span class="order-label">Price</span><span class="order-value">' + prod().price + '</span></div>' +
-                    '<div class="order-row"><span class="order-label">Order ID</span><span class="order-value">ORD-28471</span></div>' +
-                    '<div class="order-row"><span class="order-label">Status</span><span class="order-status status-pending" id="order-status">&#9675; Pending Validations</span></div>' +
-                '</div>' +
-                '<div class="terminal">' +
-                    '<div class="terminal-bar">' +
-                        '<div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div>' +
-                        '<span class="terminal-title">submit-order-automation</span>' +
-                    '</div>' +
-                    '<div class="terminal-body">' +
-                        '<div class="term-line" id="s2-l1"><span class="term-time">[0:01]</span><span class="term-check">&#10003;</span><span class="term-text">Order received from Sales</span></div>' +
-                        '<div class="term-line" id="s2-l2"><span class="term-time">[0:02]</span><span class="term-check">&#10003;</span><span class="term-text">Running validations...</span></div>' +
-                        '<div class="term-line" id="s2-l3"><span class="term-time">[0:04]</span><span class="term-check">&#10003;</span><span class="term-text">Subscriber ID assigned (auto-increment)</span></div>' +
-                        '<div class="term-line" id="s2-l4"><span class="term-time">[0:05]</span><span class="term-check">&#10003;</span><span class="term-text">Program ID assigned to order</span></div>' +
-                        '<div class="term-line" id="s2-l5"><span class="term-time">[0:06]</span><span class="term-warn">&#9888;</span><span class="term-text highlight">Manual credit vetting required &mdash; routing to AR team</span></div>' +
-                    '</div>' +
-                '</div>' +
-                '</div>'
-            );
+<!-- ============================================
+     ARCHITECTURE FLOW
+     ============================================ -->
+<section class="section-white">
+  <div class="section-inner">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">End-to-End Order Flow</h2>
+    <p class="section-subtitle">The primary order-to-activation pipeline plus secondary failure and retention workflows.</p>
+    <div class="arch-flow">
 
-            var lines = ['s2-l1','s2-l2','s2-l3','s2-l4','s2-l5'];
-            lines.forEach(function(id, i) {
-                setTimeout(function() {
-                    var el = document.getElementById(id);
-                    if (el) el.classList.add('visible');
-                }, (i + 1) * 1800);
-            });
+      <!-- Primary Flow -->
+      <div class="arch-primary">
+        <div class="arch-node">
+          <div class="arch-node-title">Sales Submits Order</div>
+          <div class="arch-node-sub">Sales rep in SSC</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-node">
+          <div class="arch-node-title">Credit Vetting</div>
+          <div class="arch-node-sub">TransUnion SA</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-node" style="border-color: transparent; box-shadow: none; background: transparent; padding: 8px 0;">
+          <div class="arch-branch">
+            <div class="arch-branch-row">
+              <span class="arch-branch-label approve">Approve</span>
+              <span style="font-size:13px; color: var(--tk-text-secondary);">&rarr; CPE Processing</span>
+            </div>
+            <div class="arch-branch-row" style="margin-top: 6px;">
+              <span class="arch-branch-label decline">Decline</span>
+              <span style="font-size:13px; color: var(--tk-text-secondary);">&rarr; Notify + Restart</span>
+            </div>
+          </div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-node">
+          <div class="arch-node-title">Fulfillment</div>
+          <div class="arch-node-sub">8 product types</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-node">
+          <div class="arch-node-title">Contract Billing Sync</div>
+          <div class="arch-node-sub">Subscriber + Program ID</div>
+        </div>
+        <div class="arch-arrow">&rarr;</div>
+        <div class="arch-node" style="border-color: var(--tk-green);">
+          <div class="arch-node-title" style="color: var(--tk-green);">Product Live</div>
+          <div class="arch-node-sub">Activated</div>
+        </div>
+      </div>
 
-            setTimeout(function() {
-                var st = document.getElementById('order-status');
-                if (st) {
-                    st.className = 'order-status status-pending';
-                    st.innerHTML = '&#9888; Awaiting Credit Vetting';
-                }
-            }, 7200);
+      <!-- Secondary Flows -->
+      <div class="arch-secondary">
+        <div class="arch-sec-card">
+          <div class="arch-trigger">Payment Fails</div>
+          <div class="arch-response">Auto-Cancel &rarr; Product Deactivation Webhook</div>
+        </div>
+        <div class="arch-sec-card">
+          <div class="arch-trigger">Order Cancelled</div>
+          <div class="arch-response">Retention Notification &rarr; 2-Day SLA Sales Task</div>
+        </div>
+        <div class="arch-sec-card">
+          <div class="arch-trigger">Billing Drift Detected</div>
+          <div class="arch-response">Audit Report &rarr; Month-End Reconciliation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            setTimeout(function() { goToScreen(2); }, 11000);
-        }
+<!-- ============================================
+     PRODUCT MANAGEMENT WORK
+     ============================================ -->
+<section class="section-gray">
+  <div class="section-inner">
+    <div class="section-label">Product Management</div>
+    <h2 class="section-title">What the Product Manager Built</h2>
+    <p class="section-subtitle">Every automation was discovered, designed, and shipped by the Product Manager &mdash; from workflow gap analysis to production deployment.</p>
+    <div class="pm-grid">
+      <div class="pm-card">
+        <div class="pm-card-num">1</div>
+        <h4>Workflow Discovery</h4>
+        <p>Mapped Telkom's entire order-to-activation lifecycle. Identified 30+ manual touchpoints across sales, credit, fulfillment, billing, and retention teams. Documented every handoff, delay, and failure point.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-num">2</div>
+        <h4>Automation Design</h4>
+        <p>Designed 30+ automations across 6 categories: order processing, fulfillment, billing, retention, account lifecycle, and data reporting. Each automation has defined triggers, logic, and success criteria.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-num">3</div>
+        <h4>Branching Logic</h4>
+        <p>Engineered credit vetting branching: approve path triggers CPE processing and fulfillment; decline path notifies the sales rep and enables order restart. No dead ends in the workflow.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-num">4</div>
+        <h4>Billing Reconciliation</h4>
+        <p>Built Contract Billing sync, billing audit reports, month-end reconciliation, and commission reporting. Automated detection of billing drift between platform and Contract Billing system.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-num">5</div>
+        <h4>Retention Engineering</h4>
+        <p>Designed the retention workflow: payment failure triggers auto-cancel, which triggers a 2-day SLA sales task. If no contact in 24 hours, a re-engagement campaign fires automatically.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-num">6</div>
+        <h4>Self-Healing Design</h4>
+        <p>Created self-healing product activation: if a product fails to activate during fulfillment, the system automatically retries. If payment resolves after cancellation, the product reactivates without manual intervention.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        // ===== SCREEN 3: Credit Vetting =====
-        function screen3() {
-            render(
-                '<div class="screen-content amber-tint">' +
-                '<div class="action-label label-vetting">&#128274; CREDIT VETTING</div>' +
-                '<div class="sim-screen-title">TransUnion Credit Check</div>' +
-                '<p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">AR team reviews the credit vetting result. Two automations are ready to fire based on the decision.</p>' +
-                '<div class="order-form">' +
-                    '<div class="order-row"><span class="order-label">Credit Bureau</span><span class="order-value">TransUnion South Africa</span></div>' +
-                    '<div class="order-row"><span class="order-label">Business</span><span class="order-value">BrightSmile Dental (Pty) Ltd</span></div>' +
-                    '<div class="order-row"><span class="order-label">Product</span><span class="order-value">' + prod().name + ' &mdash; ' + prod().price + '</span></div>' +
-                    '<div class="order-row"><span class="order-label">Credit Score</span><span class="order-value">672 / 800</span></div>' +
-                '</div>' +
-                '<p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Choose the AR team\'s decision to see which automation fires:</p>' +
-                '<div class="branch-container">' +
-                    '<div class="branch-card approve" onclick="window.__creditDecide(\'approve\')">' +
-                        '<div class="branch-title">&#10003; Approve</div>' +
-                        '<div class="branch-desc">Automation: Credit Check Approve &mdash; removes "manual-credit-vetting" tag, replaces with "manual-credit-vetting-approval", routes order to CPE for processing.</div>' +
-                    '</div>' +
-                    '<div class="branch-card decline" onclick="window.__creditDecide(\'decline\')">' +
-                        '<div class="branch-title">&#10007; Decline</div>' +
-                        '<div class="branch-desc">Automation: Credit Check Fail &mdash; adds "credit-vetting-failed" tag, declines the order, notifies the assigned sales rep via task.</div>' +
-                    '</div>' +
-                '</div>' +
-                '</div>'
-            );
-        }
+<!-- ============================================
+     FOOTER
+     ============================================ -->
+<footer class="footer">
+  <div class="footer-name">Sangeetha K</div>
+  <div class="footer-role">Product Manager &mdash; Integrations and Professional Services</div>
+  <div class="footer-links">
+    <a href="https://github.com/skrishnamoorthy" class="footer-link" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      GitHub
+    </a>
+    <a href="https://linkedin.com/in/skrishnamoorthy" class="footer-link" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      LinkedIn
+    </a>
+  </div>
+</footer>
 
-        window.__creditDecide = function(decision) {
-            creditDecision = decision;
-            goToScreen(3);
-        };
+<!-- ============================================
+     SIMULATION JAVASCRIPT
+     ============================================ -->
+<script>
+(function() {
+  'use strict';
 
-        // ===== SCREEN 4: Credit Result =====
-        function screen4() {
-            if (creditDecision === 'decline') {
-                render(
-                    '<div class="screen-content red-tint">' +
-                    '<div class="action-label label-retention">&#10007; CREDIT DECLINED</div>' +
-                    '<div class="sim-screen-title">Order Declined &mdash; Sales Notified</div>' +
-                    '<div class="terminal">' +
-                        '<div class="terminal-bar">' +
-                            '<div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div>' +
-                            '<span class="terminal-title">credit-check-decline-automation</span>' +
-                        '</div>' +
-                        '<div class="terminal-body">' +
-                            '<div class="term-line visible"><span class="term-time">[0:01]</span><span class="term-fail">&#10007;</span><span class="term-text">Credit check failed &mdash; score below threshold</span></div>' +
-                            '<div class="term-line visible"><span class="term-time">[0:02]</span><span class="term-check">&#10003;</span><span class="term-text">Tag added: "credit-vetting-failed"</span></div>' +
-                            '<div class="term-line visible"><span class="term-time">[0:03]</span><span class="term-check">&#10003;</span><span class="term-text">Order status &rarr; DECLINED</span></div>' +
-                            '<div class="term-line visible"><span class="term-time">[0:04]</span><span class="term-check">&#10003;</span><span class="term-text">Sales task created for assigned rep</span></div>' +
-                            '<div class="term-line visible"><span class="term-time">[0:05]</span><span class="term-check">&#10003;</span><span class="term-text">Salesperson notified via email</span></div>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="pipeline-big-label" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;">Order declined. Sales rep can resubmit with different terms or escalate.</div>' +
-                    '<button class="sim-btn" onclick="window.__simReset()" style="background:var(--gradient-2);">&#8634; Start Over (Try Approve Path)</button>' +
-                    '</div>'
-                );
-                return;
-            }
+  var currentScreen = 1;
+  var selectedProduct = null;
+  var creditResult = null;
+  var productMap = {
+    'WebExecutive': { name: 'All-In-One WebExecutive', price: 'R1,499', amount: '1,499', type: 'WebExecutive' },
+    'WebPro': { name: 'All-In-One WebPro', price: 'R899', amount: '899', type: 'WebPro' },
+    'Facebook': { name: 'Facebook Campaign', price: 'R599', amount: '599', type: 'Facebook' }
+  };
 
-            // Approve path
-            render(
-                '<div class="screen-content green-tint">' +
-                '<div class="action-label label-notification">&#10003; CREDIT APPROVED</div>' +
-                '<div class="sim-screen-title">Order Approved &mdash; Routed to CPE</div>' +
-                '<div class="terminal">' +
-                    '<div class="terminal-bar">' +
-                        '<div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div>' +
-                        '<span class="terminal-title">credit-check-approve-automation</span>' +
-                    '</div>' +
-                    '<div class="terminal-body">' +
-                        '<div class="term-line" id="s4-l1"><span class="term-time">[0:01]</span><span class="term-check">&#10003;</span><span class="term-text">Credit check passed &mdash; score 672/800</span></div>' +
-                        '<div class="term-line" id="s4-l2"><span class="term-time">[0:02]</span><span class="term-check">&#10003;</span><span class="term-text">Tag removed: "manual-credit-vetting"</span></div>' +
-                        '<div class="term-line" id="s4-l3"><span class="term-time">[0:03]</span><span class="term-check">&#10003;</span><span class="term-text">Tag added: "manual-credit-vetting-approval"</span></div>' +
-                        '<div class="term-line" id="s4-l4"><span class="term-time">[0:04]</span><span class="term-check">&#10003;</span><span class="term-text">Order routed to CPE for processing</span></div>' +
-                        '<div class="term-line" id="s4-l5"><span class="term-time">[0:06]</span><span class="term-check">&#10003;</span><span class="term-text">Customer Information pushed to Contract Billing</span></div>' +
-                    '</div>' +
-                '</div>' +
-                '<p style="color:var(--accent-light);font-size:13px;margin-top:12px;">Advancing to fulfillment...</p>' +
-                '</div>'
-            );
+  var stageLabels = [
+    'Stage 1 of 10 \u2014 Product Selection',
+    'Stage 2 of 10 \u2014 Order Submission',
+    'Stage 3 of 10 \u2014 Credit Vetting',
+    'Stage 4 of 10 \u2014 Credit Result',
+    'Stage 5 of 10 \u2014 Fulfillment Triggered',
+    'Stage 6 of 10 \u2014 Fulfillment Pipeline',
+    'Stage 7 of 10 \u2014 Product Live',
+    'Stage 8 of 10 \u2014 Payment Failure',
+    'Stage 9 of 10 \u2014 Retention Workflow',
+    'Stage 10 of 10 \u2014 Summary'
+  ];
 
-            var lines = ['s4-l1','s4-l2','s4-l3','s4-l4','s4-l5'];
-            lines.forEach(function(id, i) {
-                setTimeout(function() {
-                    var el = document.getElementById(id);
-                    if (el) el.classList.add('visible');
-                }, (i + 1) * 1500);
-            });
+  // Expose functions globally
+  window.selectProduct = function(el) {
+    document.querySelectorAll('.product-card').forEach(function(c) { c.classList.remove('selected'); });
+    el.classList.add('selected');
+    selectedProduct = el.getAttribute('data-product');
+    document.getElementById('btnSubmitOrder').disabled = false;
+  };
 
-            setTimeout(function() { goToScreen(4); }, 10000);
-        }
+  window.goScreen = function(n) {
+    currentScreen = n;
+    updateScreen();
+    if (n === 2) runTerminal2();
+    if (n === 5) highlightFulfillment();
+    if (n === 6) runTerminal6();
+    if (n === 7) populateLive();
+  };
 
-        // ===== SCREEN 5: Fulfillment Triggered =====
-        function screen5() {
-            render(
-                '<div class="screen-content purple-tint">' +
-                '<div class="action-label label-fulfillment">&#9881; FULFILLMENT AUTOMATION</div>' +
-                '<div class="sim-screen-title">Auto-Kick Project in Task Manager</div>' +
-                '<p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">Product activated on account &rarr; fulfillment automation fires &rarr; project created in Task Manager automatically.</p>' +
-                '<div class="order-form">' +
-                    '<div class="order-row"><span class="order-label">Automation</span><span class="order-value">Fulfillment &mdash; ' + prod().name + '</span></div>' +
-                    '<div class="order-row"><span class="order-label">Trigger</span><span class="order-value">Product activated on account</span></div>' +
-                    '<div class="order-row"><span class="order-label">Action</span><span class="order-value">Create project in Task Manager</span></div>' +
-                    '<div class="order-row"><span class="order-label">Pre-step</span><span class="order-value">Activate Task Manager (dependency)</span></div>' +
-                '</div>' +
-                '<p style="color:var(--text-muted);font-size:13px;margin-top:16px;margin-bottom:8px;">All 8 product types have their own fulfillment automation:</p>' +
-                '<div class="fulfill-grid">' +
-                    '<div class="fulfill-card" id="fc-1"><div class="fulfill-name">WebExecutive (AIOWE)</div><div class="fulfill-desc">Premium bundle fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-2"><div class="fulfill-name">WebPro (AIOWP)</div><div class="fulfill-desc">Standard bundle fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-3"><div class="fulfill-name">Banner Ads (MRECs)</div><div class="fulfill-desc">Display ad fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-4"><div class="fulfill-name">Web Basic (AIOWB)</div><div class="fulfill-desc">Basic website fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-5"><div class="fulfill-name">Facebook Campaigns</div><div class="fulfill-desc">Social ad fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-6"><div class="fulfill-name">Google Adwords</div><div class="fulfill-desc">Search ad fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-7"><div class="fulfill-name">Google Call Only</div><div class="fulfill-desc">Call campaign fulfillment</div></div>' +
-                    '<div class="fulfill-card" id="fc-8"><div class="fulfill-name">Google Display Network</div><div class="fulfill-desc">Display network fulfillment</div></div>' +
-                '</div>' +
-                '</div>'
-            );
+  window.creditDecision = function(decision) {
+    creditResult = decision;
+    currentScreen = 4;
+    updateScreen();
+    renderCreditResult();
+  };
 
-            // Animate cards in
-            for (var i = 1; i <= 8; i++) {
-                (function(idx) {
-                    setTimeout(function() {
-                        var el = document.getElementById('fc-' + idx);
-                        if (el) {
-                            el.classList.add('visible');
-                            // Highlight the selected product's card
-                            var matchMap = { webexec: 1, webpro: 2, fbcampaign: 5 };
-                            if (idx === matchMap[selectedProduct]) {
-                                el.classList.add('lit');
-                            }
-                        }
-                    }, idx * 600);
-                })(i);
-            }
+  window.resetSim = function() {
+    currentScreen = 1;
+    selectedProduct = null;
+    creditResult = null;
+    document.querySelectorAll('.product-card').forEach(function(c) { c.classList.remove('selected'); });
+    document.getElementById('btnSubmitOrder').disabled = true;
+    updateScreen();
+  };
 
-            setTimeout(function() { goToScreen(5); }, 8000);
-        }
+  function updateScreen() {
+    // Update screens
+    document.querySelectorAll('.sim-screen').forEach(function(s) { s.classList.remove('active'); });
+    var target = document.querySelector('.sim-screen[data-screen="' + currentScreen + '"]');
+    if (target) target.classList.add('active');
 
-        // ===== SCREEN 6: Fulfillment Pipeline =====
-        function screen6() {
-            render(
-                '<div class="screen-content purple-tint">' +
-                '<div class="action-label label-fulfillment">&#9881; FULFILLMENT PIPELINE</div>' +
-                '<div class="sim-screen-title">Automation Pipeline Running</div>' +
-                '<div class="terminal">' +
-                    '<div class="terminal-bar">' +
-                        '<div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div>' +
-                        '<span class="terminal-title">fulfillment-' + prod().short.toLowerCase() + '-pipeline</span>' +
-                    '</div>' +
-                    '<div class="terminal-body">' +
-                        '<div class="term-line" id="s6-l1"><span class="term-time">[0:01]</span><span class="term-check">&#10003;</span><span class="term-text">' + prod().name + ' activated on account</span></div>' +
-                        '<div class="term-line" id="s6-l2"><span class="term-time">[0:02]</span><span class="term-check">&#10003;</span><span class="term-text">Task Manager activated (dependency check)</span></div>' +
-                        '<div class="term-line" id="s6-l3"><span class="term-time">[0:04]</span><span class="term-check">&#10003;</span><span class="term-text">Fulfillment project created in Task Manager</span></div>' +
-                        '<div class="term-line" id="s6-l4"><span class="term-time">[0:05]</span><span class="term-check">&#10003;</span><span class="term-text">Contract pushed to Contract Billing</span></div>' +
-                        '<div class="term-line" id="s6-l5"><span class="term-time">[0:07]</span><span class="term-check">&#10003;</span><span class="term-text">Audit report triggered &mdash; platform vs Contract Billing</span></div>' +
-                        '<div class="term-line" id="s6-l6"><span class="term-time">[0:08]</span><span class="term-check">&#10003;</span><span class="term-text">Welcome automation fired &mdash; subscriber onboarded</span></div>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="pipeline-big-label" id="pipeline-done" style="opacity:0;">6 AUTOMATIONS FIRED &mdash; Order submitted to product live, zero manual steps</div>' +
-                '</div>'
-            );
+    // Update dots
+    document.querySelectorAll('.sim-dot').forEach(function(d) {
+      var sn = parseInt(d.getAttribute('data-screen'));
+      d.classList.remove('active', 'completed');
+      if (sn === currentScreen) d.classList.add('active');
+      else if (sn < currentScreen) d.classList.add('completed');
+    });
 
-            var lines = ['s6-l1','s6-l2','s6-l3','s6-l4','s6-l5','s6-l6'];
-            lines.forEach(function(id, i) {
-                setTimeout(function() {
-                    var el = document.getElementById(id);
-                    if (el) el.classList.add('visible');
-                }, (i + 1) * 1500);
-            });
+    // Update stage label
+    document.getElementById('simStageLabel').textContent = stageLabels[currentScreen - 1] || '';
+  }
 
-            setTimeout(function() {
-                var lbl = document.getElementById('pipeline-done');
-                if (lbl) { lbl.style.transition = 'opacity 0.5s'; lbl.style.opacity = '1'; }
-            }, 10500);
+  function typeLog(containerId, lines, callback) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    var i = 0;
+    function next() {
+      if (i >= lines.length) {
+        if (callback) callback();
+        return;
+      }
+      var div = document.createElement('div');
+      div.innerHTML = lines[i];
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      i++;
+      setTimeout(next, 400 + Math.random() * 300);
+    }
+    next();
+  }
 
-            setTimeout(function() { goToScreen(6); }, 13000);
-        }
+  function runTerminal2() {
+    var prod = productMap[selectedProduct] || productMap['WebExecutive'];
+    var lines = [
+      '<span class="log-time">09:13:41</span><span class="log-info">[ORDER]</span> New order received from Sales & Success Center',
+      '<span class="log-time">09:13:42</span><span class="log-info">[ORDER]</span> Business: BrightSmile Dental (Cape Town)',
+      '<span class="log-time">09:13:42</span><span class="log-info">[ORDER]</span> Product: ' + prod.name,
+      '<span class="log-time">09:13:43</span><span class="log-info">[ORDER]</span> Monthly: ' + prod.price,
+      '<span class="log-time">09:13:44</span><span class="log-ok">[CPE]</span> Submit Order to CPE automation triggered',
+      '<span class="log-time">09:13:45</span><span class="log-ok">[CPE]</span> Validating business data...',
+      '<span class="log-time">09:13:46</span><span class="log-ok">[CPE]</span> Account Group ID: AG-TLK-08847',
+      '<span class="log-time">09:13:47</span><span class="log-ok">[CPE]</span> Order submitted to CPE successfully',
+      '<span class="log-time">09:13:48</span><span class="log-info">[CREDIT]</span> Queuing TransUnion credit vetting...'
+    ];
+    typeLog('terminal2', lines, function() {
+      document.getElementById('btnToCreditVet').disabled = false;
+    });
+  }
 
-        // ===== SCREEN 7: Product Live =====
-        function screen7() {
-            render(
-                '<div class="screen-content green-tint">' +
-                '<div class="action-label label-notification">&#10004; PRODUCT LIVE</div>' +
-                '<div class="sim-screen-title">' + prod().name + ' &mdash; Active</div>' +
-                '<div class="sim-stats-grid">' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">0:08</div><div class="sim-stat-label">Total time</div></div>' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">0</div><div class="sim-stat-label">Manual steps after submission</div></div>' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">6</div><div class="sim-stat-label">Automations fired</div></div>' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">3</div><div class="sim-stat-label">Systems synced</div></div>' +
-                '</div>' +
-                '<div class="order-form">' +
-                    '<div class="order-row"><span class="order-label">Product</span><span class="order-value">' + prod().name + '</span></div>' +
-                    '<div class="order-row"><span class="order-label">SMB</span><span class="order-value">BrightSmile Dental (Cape Town)</span></div>' +
-                    '<div class="order-row"><span class="order-label">Order Status</span><span class="order-status status-approved">&#9679; Active</span></div>' +
-                    '<div class="order-row"><span class="order-label">Fulfillment</span><span class="order-status status-active">&#9679; Project Created</span></div>' +
-                    '<div class="order-row"><span class="order-label">Contract Billing</span><span class="order-status status-approved">&#9679; Synced</span></div>' +
-                '</div>' +
-                '<p style="color:var(--accent-light);font-size:13px;margin-top:16px;">Now see what happens if something goes wrong...</p>' +
-                '<button class="sim-btn" onclick="window.__simNext()">See Lifecycle Handling &#8594;</button>' +
-                '</div>'
-            );
-        }
+  function renderCreditResult() {
+    var titleEl = document.getElementById('creditResultTitle');
+    var descEl = document.getElementById('creditResultDesc');
+    var termEl = document.getElementById('terminal4');
+    var btnsEl = document.getElementById('creditResultBtns');
 
-        // ===== SCREEN 8: Payment Failure =====
-        function screen8() {
-            render(
-                '<div class="screen-content red-tint">' +
-                '<div class="action-label label-retention">&#9888; PAYMENT FAILURE</div>' +
-                '<div class="sim-screen-title">Payment Failed &mdash; Auto-Cancellation</div>' +
-                '<p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">When Contract Billing fails to collect payment, the automation triggers order cancellation automatically.</p>' +
-                '<div class="terminal">' +
-                    '<div class="terminal-bar">' +
-                        '<div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div>' +
-                        '<span class="terminal-title">payment-failed-automation</span>' +
-                    '</div>' +
-                    '<div class="terminal-body">' +
-                        '<div class="term-line" id="s8-l1"><span class="term-time">[0:01]</span><span class="term-fail">&#10007;</span><span class="term-text">Contract Billing: payment collection failed</span></div>' +
-                        '<div class="term-line" id="s8-l2"><span class="term-time">[0:02]</span><span class="term-check">&#10003;</span><span class="term-text">Payment Failed automation triggered</span></div>' +
-                        '<div class="term-line" id="s8-l3"><span class="term-time">[0:03]</span><span class="term-check">&#10003;</span><span class="term-text">Order status &rarr; CANCELLED</span></div>' +
-                        '<div class="term-line" id="s8-l4"><span class="term-time">[0:04]</span><span class="term-warn">&#9888;</span><span class="term-text highlight">Retention automation triggered...</span></div>' +
-                    '</div>' +
-                '</div>' +
-                '<p style="color:var(--accent-light);font-size:13px;margin-top:12px;">Advancing to retention workflow...</p>' +
-                '</div>'
-            );
+    if (creditResult === 'approve') {
+      titleEl.textContent = 'Credit Approved';
+      descEl.textContent = 'TransUnion returned a positive credit score. The order proceeds to fulfillment.';
+      termEl.innerHTML =
+        '<div><span class="log-time">09:14:08</span><span class="log-ok">[CREDIT]</span> TransUnion result: APPROVED</div>' +
+        '<div><span class="log-time">09:14:09</span><span class="log-ok">[CREDIT]</span> Credit score: 685 (threshold: 600)</div>' +
+        '<div><span class="log-time">09:14:10</span><span class="log-ok">[CREDIT]</span> Credit Check Approve automation fired</div>' +
+        '<div><span class="log-time">09:14:11</span><span class="log-info">[FULFILL]</span> Routing to fulfillment pipeline...</div>';
+      btnsEl.innerHTML = '<button class="sim-btn sim-btn-primary" onclick="goScreen(5)">Continue to Fulfillment</button>';
+    } else {
+      titleEl.textContent = 'Credit Declined';
+      descEl.textContent = 'TransUnion returned a negative credit score. The Credit Check Fail automation notifies the sales rep and allows order restart.';
+      termEl.innerHTML =
+        '<div><span class="log-time">09:14:08</span><span class="log-err">[CREDIT]</span> TransUnion result: DECLINED</div>' +
+        '<div><span class="log-time">09:14:09</span><span class="log-err">[CREDIT]</span> Credit score: 420 (threshold: 600)</div>' +
+        '<div><span class="log-time">09:14:10</span><span class="log-warn">[CREDIT]</span> Credit Check Fail automation fired</div>' +
+        '<div><span class="log-time">09:14:11</span><span class="log-warn">[NOTIFY]</span> Sales rep notified: credit declined for BrightSmile Dental</div>' +
+        '<div><span class="log-time">09:14:12</span><span class="log-info">[ORDER]</span> Order available for restart with updated information</div>';
+      btnsEl.innerHTML = '<button class="sim-btn sim-btn-secondary" onclick="resetSim()">Restart Order (New Submission)</button>';
+    }
+  }
 
-            var lines = ['s8-l1','s8-l2','s8-l3','s8-l4'];
-            lines.forEach(function(id, i) {
-                setTimeout(function() {
-                    var el = document.getElementById(id);
-                    if (el) el.classList.add('visible');
-                }, (i + 1) * 1800);
-            });
+  function highlightFulfillment() {
+    var prod = productMap[selectedProduct] || productMap['WebExecutive'];
+    document.querySelectorAll('.fulfillment-card').forEach(function(c) {
+      c.classList.remove('active');
+      if (c.getAttribute('data-type') === prod.type) {
+        c.classList.add('active');
+      }
+    });
+  }
 
-            setTimeout(function() { goToScreen(8); }, 9500);
-        }
+  function runTerminal6() {
+    var prod = productMap[selectedProduct] || productMap['WebExecutive'];
+    var lines = [
+      '<span class="log-time">09:15:01</span><span class="log-info">[FULFILL]</span> Starting fulfillment for ' + prod.name,
+      '<span class="log-time">09:15:02</span><span class="log-info">[FULFILL]</span> Business: BrightSmile Dental (Cape Town)',
+      '<span class="log-time">09:15:04</span><span class="log-ok">[TASK]</span> Task Manager workflow initiated',
+      '<span class="log-time">09:15:06</span><span class="log-ok">[TASK]</span> Step 1/5: Creating product instance...',
+      '<span class="log-time">09:15:08</span><span class="log-ok">[TASK]</span> Step 2/5: Configuring product settings...',
+      '<span class="log-time">09:15:10</span><span class="log-ok">[TASK]</span> Step 3/5: Assigning Subscriber ID: TLK-2024-08847',
+      '<span class="log-time">09:15:12</span><span class="log-ok">[TASK]</span> Step 4/5: Assigning Program ID: PGM-WEX-3391',
+      '<span class="log-time">09:15:14</span><span class="log-ok">[TASK]</span> Step 5/5: Pushing contract to Contract Billing...',
+      '<span class="log-time">09:15:16</span><span class="log-ok">[FULFILL]</span> Fulfillment complete. Product activated.',
+      '<span class="log-time">09:15:17</span><span class="log-ok">[BILLING]</span> Contract Billing sync confirmed'
+    ];
+    typeLog('terminal6', lines, function() {
+      document.getElementById('btnToLive').disabled = false;
+    });
+  }
 
-        // ===== SCREEN 9: Retention =====
-        function screen9() {
-            render(
-                '<div class="screen-content cyan-tint">' +
-                '<div class="action-label label-system">&#128337; RETENTION AUTOMATION</div>' +
-                '<div class="sim-screen-title">Customer Retention &mdash; 2-Day SLA</div>' +
-                '<p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">When an order is cancelled, the retention team is notified immediately and a sales task is created with a 2-day due date.</p>' +
-                '<div class="retention-flow">' +
-                    '<div class="retention-node alert-node">Order Cancelled</div>' +
-                    '<span class="retention-arrow">&rarr;</span>' +
-                    '<div class="retention-node active-node">Retention Team Notified</div>' +
-                    '<span class="retention-arrow">&rarr;</span>' +
-                    '<div class="retention-node">Sales Task Created</div>' +
-                    '<span class="retention-arrow">&rarr;</span>' +
-                    '<div class="retention-node">2-Day SLA</div>' +
-                '</div>' +
-                '<div class="terminal">' +
-                    '<div class="terminal-bar">' +
-                        '<div class="terminal-dot r"></div><div class="terminal-dot y"></div><div class="terminal-dot g"></div>' +
-                        '<span class="terminal-title">customer-retention-automation</span>' +
-                    '</div>' +
-                    '<div class="terminal-body">' +
-                        '<div class="term-line" id="s9-l1"><span class="term-time">[0:01]</span><span class="term-check">&#10003;</span><span class="term-text">Order cancellation detected</span></div>' +
-                        '<div class="term-line" id="s9-l2"><span class="term-time">[0:02]</span><span class="term-check">&#10003;</span><span class="term-text">Retention team notified via email + in-app</span></div>' +
-                        '<div class="term-line" id="s9-l3"><span class="term-time">[0:03]</span><span class="term-check">&#10003;</span><span class="term-text">Sales task created &mdash; due in 2 business days</span></div>' +
-                        '<div class="term-line" id="s9-l4"><span class="term-time">[0:04]</span><span class="term-check">&#10003;</span><span class="term-text">Assigned to: original sales rep</span></div>' +
-                        '<div class="term-line" id="s9-l5"><span class="term-time">[0:05]</span><span class="term-check">&#10003;</span><span class="term-text">Contract Billing sync: deactivation recorded</span></div>' +
-                    '</div>' +
-                '</div>' +
-                '<button class="sim-btn" onclick="window.__simNext()">See Summary &#8594;</button>' +
-                '</div>'
-            );
+  function populateLive() {
+    var prod = productMap[selectedProduct] || productMap['WebExecutive'];
+    document.getElementById('liveProduct').textContent = prod.name;
+    document.getElementById('livePrice').textContent = prod.price + '/mo';
+    document.getElementById('failedAmount').textContent = prod.amount;
+  }
 
-            var lines = ['s9-l1','s9-l2','s9-l3','s9-l4','s9-l5'];
-            lines.forEach(function(id, i) {
-                setTimeout(function() {
-                    var el = document.getElementById(id);
-                    if (el) el.classList.add('visible');
-                }, (i + 1) * 1500);
-            });
-        }
-
-        // ===== SCREEN 10: Summary =====
-        function screen10() {
-            render(
-                '<div class="screen-content">' +
-                '<div class="action-label label-result">&#10004; SIMULATION COMPLETE</div>' +
-                '<div class="sim-screen-title">Full Order Lifecycle &mdash; Automated</div>' +
-                '<div class="sim-stats-grid">' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">30+</div><div class="sim-stat-label">Production automations</div></div>' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">6</div><div class="sim-stat-label">Categories</div></div>' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">500K+</div><div class="sim-stat-label">Subscribers</div></div>' +
-                    '<div class="sim-stat-item"><div class="sim-stat-value">0</div><div class="sim-stat-label">Manual steps</div></div>' +
-                '</div>' +
-                '<div style="margin:20px 0;">' +
-                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
-                        '<div style="background:var(--surface);border:1px solid var(--glass-border);border-radius:10px;padding:14px;text-align:left;">' +
-                            '<div style="font-size:12px;color:var(--accent-light);font-weight:600;margin-bottom:6px;">WHAT YOU SAW</div>' +
-                            '<div style="font-size:13px;color:var(--text-muted);line-height:1.6;">' +
-                                '1. Sales submits order<br>' +
-                                '2. Credit vetting (TransUnion)<br>' +
-                                '3. Approve/Decline branching<br>' +
-                                '4. Fulfillment auto-kick (8 product types)<br>' +
-                                '5. Contract Billing sync + audit<br>' +
-                                '6. Payment failure &rarr; auto-cancel<br>' +
-                                '7. Retention &rarr; 2-day SLA task' +
-                            '</div>' +
-                        '</div>' +
-                        '<div style="background:var(--surface);border:1px solid var(--glass-border);border-radius:10px;padding:14px;text-align:left;">' +
-                            '<div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:6px;">WHAT THE PM DID</div>' +
-                            '<div style="font-size:13px;color:var(--text-muted);line-height:1.6;">' +
-                                '&#8226; Mapped manual workflows<br>' +
-                                '&#8226; Designed trigger/action logic<br>' +
-                                '&#8226; Built decision trees (approve/decline)<br>' +
-                                '&#8226; Created self-healing patterns<br>' +
-                                '&#8226; Defined audit & reconciliation<br>' +
-                                '&#8226; Engineered retention SLAs<br>' +
-                                '&#8226; Coordinated with Chennai engineering' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-                '<button class="sim-btn" onclick="window.__simReset()" style="background:var(--gradient-2);">&#8634; Run Again</button>' +
-                '</div>'
-            );
-        }
-
-        // Navigation
-        var screens = [screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8, screen9, screen10];
-
-        function goToScreen(index) {
-            if (index < 0 || index >= screens.length) return;
-            currentScreen = index;
-            screens[currentScreen]();
-        }
-
-        window.__simNext = function() {
-            goToScreen(currentScreen + 1);
-        };
-
-        window.__simReset = function() {
-            selectedProduct = null;
-            creditDecision = null;
-            goToScreen(0);
-        };
-
-        // Initialize
-        goToScreen(0);
-    })();
-    </script>
+  // Initialize
+  updateScreen();
+})();
+</script>
 
 </body>
 </html>
